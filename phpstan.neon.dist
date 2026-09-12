@@ -1,0 +1,52 @@
+#
+# Static analysis for the plugin's runtime PHP.
+#
+# Level 5 is the practical ceiling for a WordPress plugin without a type
+# rewrite: it catches wrong method calls, impossible branches, null misuse and
+# undefined symbols, while stopping short of demanding precise array shapes
+# from WordPress's own untyped APIs. The WordPress and WooCommerce stubs give
+# it the symbols to check against.
+#
+# The WordPress extension is loaded automatically by phpstan/extension-installer.
+parameters:
+	level: 5
+
+	# WordPress and WooCommerce docblocks describe the usual return type, not a
+	# guarantee: almost every value passes through a filter that any plugin
+	# can change, and `WC()->countries` is null until WooCommerce has booted.
+	# The plugin's defensive `is_string()` / `is_array()` / null checks on
+	# those values are deliberate, so docblock types are treated as hints.
+	# Native PHP types remain certain and are still enforced.
+	treatPhpDocTypesAsCertain: false
+
+	paths:
+		- woocommerce-customer-portal.php
+		- uninstall.php
+		- includes
+		- public
+		- admin
+		- rest
+
+	# Templates are included with `$wcp` in scope and are exercised by the
+	# integration suite; PHPStan cannot see the include context.
+	excludePaths:
+		- templates
+		- admin/views
+
+	scanFiles:
+		- vendor/php-stubs/woocommerce-stubs/woocommerce-stubs.php
+		- vendor/php-stubs/woocommerce-stubs/woocommerce-packages-stubs.php
+
+	bootstrapFiles:
+		- tests/phpstan-bootstrap.php
+
+	ignoreErrors:
+		# Deliberate: WooCommerce's own order-details template calls
+		# `$product->get_permalink( $item )` so that a variation resolves to
+		# its own URL. The base `WC_Product::get_permalink()` signature has no
+		# parameter; `WC_Product_Variation` accepts the item. PHP ignores the
+		# extra argument for simple products, exactly as WooCommerce relies on.
+		-
+			message: '#Method WC_Product::get_permalink\(\) invoked with 1 parameter, 0 required#'
+			path: public/class-wcp-orders.php
+			count: 1

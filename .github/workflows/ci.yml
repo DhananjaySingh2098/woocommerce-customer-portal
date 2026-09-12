@@ -1,0 +1,253 @@
+# Continuous integration for WooCommerce Customer Portal.
+#
+# Every job is a required check. The `test` matrix runs the real WordPress
+# test framework against a real WooCommerce install, and the `security` suite
+# inside it (cross-customer and write-protection gates) fails the build on
+# its own so a regression there is never buried in a long PHPUnit log.
+#
+# The matrix mirrors the compatibility claims in readme.txt: PHP 7.4-8.3,
+# WordPress 6.0 to latest, WooCommerce 7.0 to latest, in the oldest, middle
+# and newest combinations that can actually run together.
+
+name: CI
+
+on:
+  push:
+    branches: ['**']
+  pull_request:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  # ---------------------------------------------------------------------------
+  # PHP syntax on every supported interpreter. Cheap, so it runs on all five.
+  # ---------------------------------------------------------------------------
+  lint:
+    name: PHP ${{ matrix.php }} syntax
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        php: ['7.4', '8.0', '8.1', '8.2', '8.3']
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: ${{ matrix.php }}
+          coverage: none
+          tools: none
+
+      - name: php -l
+        run: |
+          set -e
+          find . -name '*.php' -not -path './vendor/*' -not -path './dist/*' -print0 \
+            | xargs -0 -n1 php -l > /dev/null
+          echo "PHP ${{ matrix.php }}: syntax OK"
+
+  # ---------------------------------------------------------------------------
+  # JavaScript syntax. The plugin ships plain ES5 with no build step, so a
+  # parse check is the whole story.
+  # ---------------------------------------------------------------------------
+  js:
+    name: JavaScript syntax
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: node --check
+        run: |
+          set -e
+          for f in assets/js/*.js; do node --check "$f"; done
+          echo "JavaScript syntax OK"
+
+  # ---------------------------------------------------------------------------
+  # Coding standards and static analysis.
+  # ---------------------------------------------------------------------------
+  standards:
+    name: PHPCS + PHPStan
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.2'
+          coverage: none
+          tools: composer:v2
+
+      - name: Install Composer dependencies
+        uses: ramsey/composer-install@v3
+
+      - name: PHPCS (WordPress-Extra, WordPress-Docs, PHPCompatibilityWP)
+        run: vendor/bin/phpcs -q --report=full
+
+      - name: PHPStan
+        run: vendor/bin/phpstan analyse --memory-limit=2G --no-progress
+
+      - name: Prefix guard
+        # Every global function, class and constant the plugin defines must
+        # carry the wcp / WCP prefix. Enforced here as well as in PHPCS.
+        run: |
+          set -e
+          bad=$(grep -rhoE '^(function|class|abstract class|final class|interface|trait) +[A-Za-z_][A-Za-z0-9_]*' \
+            --include='*.php' woocommerce-customer-portal.php uninstall.php includes public admin rest \
+            | awk '{print $NF}' | grep -viE '^(wcp_|WCP_)' || true)
+          if [ -n "$bad" ]; then echo "Unprefixed globals:"; echo "$bad"; exit 1; fi
+          echo "Prefix guard OK"
+
+  # ---------------------------------------------------------------------------
+  # Secret and fixture guard. The repository must never carry credentials.
+  # ---------------------------------------------------------------------------
+  secrets:
+    name: Secret scan
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Scan tracked files
+        run: |
+          set -e
+          # The last alternative catches the local dev-environment fixture
+          # password family; the bracket keeps this file from matching itself.
+          pattern='(AKIA[0-9A-Z]{16}|sk_(live|test)_[0-9A-Za-z]{10,}|ghp_[0-9A-Za-z]{20,}|xox[baprs]-[0-9A-Za-z-]{10,}|-----BEGIN [A-Z ]*PRIVATE KEY-----|Portal-Tes[t]!)'
+          if git ls-files | grep -v '^docs/screenshots/' | xargs grep -nE "$pattern" 2>/dev/null; then
+            echo "Possible credential found"; exit 1
+          fi
+          for f in .env .env.local wp-config.php wp-config-local.php; do
+            if git ls-files --error-unmatch "$f" >/dev/null 2>&1; then echo "$f must not be committed"; exit 1; fi
+          done
+          echo "Secret scan OK"
+
+  # ---------------------------------------------------------------------------
+  # PHPUnit against real WordPress + WooCommerce.
+  # ---------------------------------------------------------------------------
+  test:
+    name: Tests (PHP ${{ matrix.php }}, WP ${{ matrix.wp }}, WC ${{ matrix.wc }})
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          # Oldest supported combination.
+          - php: '7.4'
+            wp: '6.0.11'
+            wc: '7.0.1'
+          # Middle of the supported range.
+          - php: '8.1'
+            wp: '6.4.10'
+            wc: '8.5.2'
+          # Newest: latest WordPress and WooCommerce on the newest PHP.
+          - php: '8.3'
+            wp: 'latest'
+            wc: 'latest'
+          # Newest WordPress/WooCommerce must also still run on the oldest PHP.
+          - php: '7.4'
+            wp: 'latest'
+            wc: 'latest'
+
+    services:
+      mysql:
+        image: mariadb:10.11
+        env:
+          MARIADB_ROOT_PASSWORD: root
+          MARIADB_DATABASE: wordpress_test
+        ports:
+          - 3306:3306
+        options: >-
+          --health-cmd="healthcheck.sh --connect --innodb_initialized"
+          --health-interval=10s --health-timeout=5s --health-retries=10
+
+    env:
+      WP_CORE_DIR: /tmp/wordpress
+      WC_PLUGIN_DIR: /tmp/wordpress/wp-content/plugins/woocommerce
+      WP_TESTS_DIR: /tmp/wp-phpunit
+      WP_TESTS_DB_HOST: 127.0.0.1
+      WP_TESTS_DB_NAME: wordpress_test
+      WP_TESTS_DB_USER: root
+      WP_TESTS_DB_PASSWORD: root
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: ${{ matrix.php }}
+          extensions: mysqli, zip
+          coverage: none
+          tools: composer:v2
+
+      - name: Install Composer dependencies
+        uses: ramsey/composer-install@v3
+
+      - name: Resolve versions
+        id: versions
+        run: |
+          set -e
+          if [ "${{ matrix.wp }}" = "latest" ]; then
+            wp=$(curl -fsSL https://api.wordpress.org/core/version-check/1.7/ | php -r 'echo json_decode(stream_get_contents(STDIN))->offers[0]->version;')
+          else
+            wp="${{ matrix.wp }}"
+          fi
+          if [ "${{ matrix.wc }}" = "latest" ]; then
+            wc=$(curl -fsSL "https://api.wordpress.org/plugins/info/1.0/woocommerce.json" | php -r 'echo json_decode(stream_get_contents(STDIN))->version;')
+          else
+            wc="${{ matrix.wc }}"
+          fi
+          echo "wp=$wp" >> "$GITHUB_OUTPUT"
+          echo "wc=$wc" >> "$GITHUB_OUTPUT"
+          echo "WordPress $wp, WooCommerce $wc"
+
+      - name: Install WordPress core and WooCommerce
+        run: |
+          set -e
+          curl -fsSL "https://wordpress.org/wordpress-${{ steps.versions.outputs.wp }}.tar.gz" | tar -xz -C /tmp
+          curl -fsSL -o /tmp/wc.zip "https://downloads.wordpress.org/plugin/woocommerce.${{ steps.versions.outputs.wc }}.zip"
+          unzip -q /tmp/wc.zip -d "$WP_CORE_DIR/wp-content/plugins"
+          # The test library must match the core version under test.
+          curl -fsSL "https://github.com/wp-phpunit/wp-phpunit/archive/refs/tags/${{ steps.versions.outputs.wp }}.tar.gz" | tar -xz -C /tmp
+          mv "/tmp/wp-phpunit-${{ steps.versions.outputs.wp }}" "$WP_TESTS_DIR"
+
+      - name: Unit + integration suites
+        run: vendor/bin/phpunit --testsuite unit,integration
+
+      - name: Security suite (required gate)
+        run: vendor/bin/phpunit --testsuite security
+
+      - name: Degraded boot (WooCommerce absent)
+        run: vendor/bin/phpunit -c phpunit-degraded.xml.dist
+
+  # ---------------------------------------------------------------------------
+  # Release package. Built on every run so a packaging regression is caught
+  # before a tag, and uploaded as an artifact for manual install testing.
+  # ---------------------------------------------------------------------------
+  build:
+    name: Build ZIP
+    runs-on: ubuntu-latest
+    needs: [lint, js, standards, secrets, test]
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.2'
+          coverage: none
+          tools: none
+
+      - name: Build
+        run: sh scripts/build-plugin.sh --check
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: woocommerce-customer-portal
+          path: dist/woocommerce-customer-portal.zip
+          if-no-files-found: error

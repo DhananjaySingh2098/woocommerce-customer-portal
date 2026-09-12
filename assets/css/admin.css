@@ -1,0 +1,529 @@
+/*
+ * WooCommerce Customer Portal — admin styles.
+ *
+ * Deliberately minimal: the plugin-list row, dependency notices and the
+ * settings screen. It intentionally follows core admin conventions rather
+ * than the portal design system — wp-admin should look like wp-admin.
+ */
+
+.wcp-row-meta {
+	display: inline-flex;
+	align-items: center;
+	gap: 6px;
+}
+
+.wcp-row-meta code {
+	position: relative;
+	padding: 2px 7px;
+	border-radius: 4px;
+	background: #f0f0f1;
+	color: #2c3338;
+	font-size: 12px;
+	cursor: copy;
+	transition: background-color 150ms ease, color 150ms ease;
+}
+
+.wcp-row-meta code:hover {
+	background: #e5e5e6;
+}
+
+.wcp-row-meta code:focus-visible {
+	outline: 2px solid #2271b1;
+	outline-offset: 1px;
+}
+
+.wcp-row-meta code.is-copied {
+	background: #d5efe0;
+	color: #0a4b34;
+}
+
+.wcp-row-meta code.is-copied::after {
+	content: attr(data-wcp-copied);
+	position: absolute;
+	bottom: calc(100% + 6px);
+	left: 50%;
+	padding: 3px 8px;
+	border-radius: 4px;
+	background: #1d2327;
+	color: #fff;
+	font-size: 11px;
+	white-space: nowrap;
+	transform: translateX(-50%);
+	pointer-events: none;
+}
+
+.notice .wcp-notice-actions {
+	margin-top: 6px;
+}
+
+/* ==========================================================================
+   Settings screen
+   ========================================================================== */
+
+/*
+ * A WordPress screen first. Core's `.wrap`, `.form-table` and notices do the
+ * heavy lifting; these rules add grouping and a handful of purpose-built
+ * controls, and borrow core's own palette (#2271b1, #1d2327, #f0f0f1) rather
+ * than the portal's, so the page reads as wp-admin and not as a foreign UI
+ * dropped into it.
+ */
+
+.wcp-admin .wcp-admin__lede {
+	max-width: 62ch;
+	margin: 4px 0 18px;
+	color: #50575e;
+	font-size: 14px;
+}
+
+.wcp-admin__form {
+	max-width: 960px;
+}
+
+.wcp-admin__card {
+	margin: 0 0 20px;
+	background: #fff;
+	border: 1px solid #dcdcde;
+	border-radius: 6px;
+	box-shadow: 0 1px 1px rgba(0, 0, 0, 0.04);
+}
+
+.wcp-admin__card-head {
+	padding: 16px 20px 12px;
+	border-bottom: 1px solid #f0f0f1;
+}
+
+.wcp-admin__card-head h2 {
+	margin: 0 0 4px;
+	font-size: 15px;
+	font-weight: 600;
+	line-height: 1.3;
+}
+
+.wcp-admin__card-head p {
+	margin: 0;
+	color: #646970;
+	font-size: 13px;
+}
+
+.wcp-admin__card .form-table {
+	margin: 0;
+}
+
+.wcp-admin__card .form-table th,
+.wcp-admin__card .form-table td {
+	padding-left: 20px;
+	padding-right: 20px;
+}
+
+.wcp-admin__card .form-table tr:last-child th,
+.wcp-admin__card .form-table tr:last-child td {
+	padding-bottom: 22px;
+}
+
+.wcp-admin__card .description {
+	max-width: 60ch;
+}
+
+.wcp-admin .wcp-select {
+	min-width: 280px;
+	max-width: 100%;
+}
+
+/* --- Toggle ------------------------------------------------------------- */
+
+.wcp-toggle {
+	display: inline-flex;
+	align-items: center;
+	gap: 10px;
+	cursor: pointer;
+	user-select: none;
+}
+
+.wcp-toggle input {
+	position: absolute;
+	width: 1px;
+	height: 1px;
+	margin: -1px;
+	overflow: hidden;
+	clip: rect(0, 0, 0, 0);
+	clip-path: inset(50%);
+	border: 0;
+}
+
+.wcp-toggle__track {
+	position: relative;
+	flex: none;
+	width: 38px;
+	height: 22px;
+	border-radius: 999px;
+	background: #8c8f94;
+	transition: background-color 160ms ease;
+}
+
+.wcp-toggle__thumb {
+	position: absolute;
+	top: 3px;
+	left: 3px;
+	width: 16px;
+	height: 16px;
+	border-radius: 999px;
+	background: #fff;
+	box-shadow: 0 1px 2px rgba(0, 0, 0, 0.25);
+	transition: transform 160ms ease;
+}
+
+.wcp-toggle input:checked + .wcp-toggle__track {
+	background: #2271b1;
+}
+
+.wcp-toggle input:checked + .wcp-toggle__track .wcp-toggle__thumb {
+	transform: translateX(16px);
+}
+
+.wcp-toggle input:focus-visible + .wcp-toggle__track {
+	outline: 2px solid #2271b1;
+	outline-offset: 2px;
+}
+
+.wcp-toggle__label {
+	font-weight: 500;
+}
+
+/* --- Section checkboxes ------------------------------------------------- */
+
+.wcp-admin__checks {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 8px 18px;
+	margin: 0 0 4px;
+}
+
+.wcp-check {
+	display: inline-flex;
+	align-items: center;
+	gap: 6px;
+	padding: 6px 10px 6px 8px;
+	border: 1px solid #dcdcde;
+	border-radius: 4px;
+	background: #fff;
+	cursor: pointer;
+	transition: border-color 120ms ease, background-color 120ms ease;
+}
+
+.wcp-check:hover {
+	border-color: #8c8f94;
+}
+
+.wcp-check input {
+	margin: 0;
+}
+
+/* --- Portal page note --------------------------------------------------- */
+
+.wcp-admin__note {
+	display: flex;
+	align-items: flex-start;
+	gap: 8px;
+	max-width: 60ch;
+	margin: 10px 0 4px;
+	padding: 8px 12px;
+	border-radius: 4px;
+	border: 1px solid #dcdcde;
+	background: #f6f7f7;
+	color: #1d2327;
+	font-size: 13px;
+	line-height: 1.5;
+}
+
+.wcp-admin__note-dot {
+	flex: none;
+	width: 8px;
+	height: 8px;
+	margin-top: 6px;
+	border-radius: 999px;
+	background: #8c8f94;
+}
+
+.wcp-admin__note--ok {
+	border-color: #b7dfc7;
+	background: #edf9f2;
+}
+
+.wcp-admin__note--ok .wcp-admin__note-dot {
+	background: #00a32a;
+}
+
+.wcp-admin__note--warning {
+	border-color: #f0c99b;
+	background: #fcf5ea;
+}
+
+.wcp-admin__note--warning .wcp-admin__note-dot {
+	background: #dba617;
+}
+
+/* --- Accent ------------------------------------------------------------- */
+
+.wcp-accent {
+	display: flex;
+	flex-wrap: wrap;
+	align-items: center;
+	gap: 12px;
+}
+
+.wcp-accent__picker {
+	width: 44px;
+	height: 32px;
+	padding: 2px;
+	border: 1px solid #8c8f94;
+	border-radius: 4px;
+	background: #fff;
+	cursor: pointer;
+}
+
+.wcp-accent__hex {
+	padding: 4px 8px;
+	font-size: 12px;
+	letter-spacing: 0.02em;
+}
+
+.wcp-accent__preview {
+	display: inline-flex;
+	align-items: center;
+	padding: 7px 16px;
+	border-radius: 6px;
+	background: var(--wcp-admin-accent, #5b4ce0);
+	color: var(--wcp-admin-accent-on, #fff);
+	font-size: 13px;
+	font-weight: 600;
+	line-height: 1.3;
+	box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.16), 0 1px 2px rgba(0, 0, 0, 0.08);
+	transition: background-color 120ms ease, color 120ms ease;
+}
+
+.wcp-accent__contrast {
+	padding: 3px 9px;
+	border-radius: 999px;
+	font-size: 12px;
+	font-weight: 500;
+}
+
+.wcp-accent__contrast--ok {
+	background: #edf9f2;
+	color: #0a4b34;
+}
+
+.wcp-accent__contrast--warn {
+	background: #fcf0f1;
+	color: #8a1f1f;
+}
+
+@media (prefers-reduced-motion: reduce) {
+	.wcp-toggle__track,
+	.wcp-toggle__thumb,
+	.wcp-check,
+	.wcp-accent__preview {
+		transition: none;
+	}
+}
+
+@media (max-width: 782px) {
+	.wcp-admin .wcp-select {
+		min-width: 0;
+		width: 100%;
+	}
+}
+
+/* --- Visual theme picker ------------------------------------------------- */
+
+.wcp-visuals {
+	display: grid;
+	grid-template-columns: repeat(auto-fit, minmax(196px, 1fr));
+	gap: 12px;
+	max-width: 1120px;
+	margin: 0;
+	padding: 0;
+	border: 0;
+}
+
+.wcp-visual {
+	position: relative;
+	display: block;
+	cursor: pointer;
+}
+
+.wcp-visual input {
+	position: absolute;
+	opacity: 0;
+	width: 1px;
+	height: 1px;
+	margin: 0;
+}
+
+.wcp-visual__card {
+	display: flex;
+	flex-direction: column;
+	gap: 4px;
+	padding: 10px;
+	border: 1px solid #dcdcde;
+	border-radius: 10px;
+	background: #fff;
+	transition: border-color 150ms ease, box-shadow 150ms ease, transform 150ms ease;
+}
+
+.wcp-visual:hover .wcp-visual__card {
+	border-color: #8c8f94;
+	transform: translateY(-1px);
+}
+
+.wcp-visual input:checked + .wcp-visual__card {
+	border-color: #2271b1;
+	box-shadow: 0 0 0 2px rgba(34, 113, 177, 0.25);
+}
+
+.wcp-visual input:focus-visible + .wcp-visual__card {
+	outline: 2px solid #2271b1;
+	outline-offset: 2px;
+}
+
+.wcp-visual__preview {
+	display: grid;
+	grid-template-columns: 26% 1fr;
+	height: 74px;
+	margin-bottom: 6px;
+	overflow: hidden;
+	border-radius: 7px;
+	border: 1px solid rgba(0, 0, 0, 0.08);
+}
+
+.wcp-visual__preview-side {
+	border-right: 1px solid rgba(0, 0, 0, 0.06);
+}
+
+.wcp-visual__preview-body {
+	display: flex;
+	flex-direction: column;
+	gap: 6px;
+	padding: 8px;
+}
+
+.wcp-visual__preview-bar {
+	width: 60%;
+	height: 6px;
+	border-radius: 3px;
+}
+
+.wcp-visual__preview-tiles {
+	display: grid;
+	grid-template-columns: repeat(3, 1fr);
+	gap: 5px;
+	flex: 1;
+}
+
+.wcp-visual__preview-tiles span {
+	border-radius: 4px;
+}
+
+.wcp-visual__preview--aurora {
+	background: linear-gradient(135deg, #f3f4fa, #f9f7ff);
+}
+
+.wcp-visual__preview--aurora .wcp-visual__preview-side {
+	background: #ffffff;
+}
+
+.wcp-visual__preview--aurora .wcp-visual__preview-bar {
+	background: linear-gradient(90deg, #5b4ce0, #8b7cf6);
+}
+
+.wcp-visual__preview--aurora .wcp-visual__preview-tiles span {
+	background: #fff;
+	box-shadow: 0 1px 3px rgba(40, 30, 120, 0.14);
+}
+
+.wcp-visual__preview--obsidian {
+	background: linear-gradient(135deg, #0f1114, #1a1d23);
+}
+
+.wcp-visual__preview--obsidian .wcp-visual__preview-side {
+	background: #121417;
+	border-right-color: rgba(255, 255, 255, 0.08);
+}
+
+.wcp-visual__preview--obsidian .wcp-visual__preview-bar {
+	background: linear-gradient(90deg, #7c86ff, #a2aaff);
+}
+
+.wcp-visual__preview--obsidian .wcp-visual__preview-tiles span {
+	background: #1c1f25;
+	box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.06);
+}
+
+.wcp-visual__preview--pearl {
+	background: linear-gradient(135deg, #f7f5f0, #fbf8f2);
+}
+
+.wcp-visual__preview--pearl .wcp-visual__preview-side {
+	background: #fffefb;
+}
+
+.wcp-visual__preview--pearl .wcp-visual__preview-bar {
+	background: linear-gradient(90deg, #4a5fc1, #7d8ed9);
+}
+
+.wcp-visual__preview--pearl .wcp-visual__preview-tiles span {
+	background: #fffefb;
+	box-shadow: 0 1px 3px rgba(80, 60, 20, 0.12);
+}
+
+.wcp-visual__preview--midnight {
+	background: linear-gradient(135deg, #070c1c, #131f42);
+}
+
+.wcp-visual__preview--midnight .wcp-visual__preview-side {
+	background: #0e1528;
+}
+
+.wcp-visual__preview--midnight .wcp-visual__preview-bar {
+	background: linear-gradient(90deg, #7b9cff, #62c8ff);
+}
+
+.wcp-visual__preview--midnight .wcp-visual__preview-tiles span {
+	background: #16203e;
+	box-shadow: inset 0 1px 0 rgba(160, 190, 255, 0.09);
+}
+
+.wcp-visual__preview--emerald {
+	background: linear-gradient(135deg, #08100d, #14261f);
+}
+
+.wcp-visual__preview--emerald .wcp-visual__preview-side {
+	background: #0f1815;
+}
+
+.wcp-visual__preview--emerald .wcp-visual__preview-bar {
+	background: linear-gradient(90deg, #34d399, #38bdb2);
+}
+
+.wcp-visual__preview--emerald .wcp-visual__preview-tiles span {
+	background: #17251f;
+	box-shadow: inset 0 1px 0 rgba(140, 255, 205, 0.08);
+}
+
+.wcp-visual__name {
+	color: #1d2327;
+	font-size: 13px;
+	font-weight: 600;
+}
+
+.wcp-visual__text {
+	color: #646970;
+	font-size: 12px;
+	line-height: 1.45;
+}
+
+@media (max-width: 782px) {
+	.wcp-visuals {
+		grid-template-columns: minmax(0, 1fr);
+	}
+}

@@ -1,0 +1,1486 @@
+# Copyright (C) 2026 Dhananjay Singh
+# This file is distributed under the GPL-2.0-or-later.
+msgid ""
+msgstr ""
+"Project-Id-Version: WooCommerce Customer Portal 1.0.0\n"
+"Report-Msgid-Bugs-To: https://github.com/dhananjaysingh/woocommerce-customer-portal/issues\n"
+"Last-Translator: Dhananjay Singh\n"
+"Language-Team: Dhananjay Singh\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"POT-Creation-Date: 2026-09-12T05:10:51+00:00\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"X-Generator: WP-CLI 2.12.0\n"
+"X-Domain: woocommerce-customer-portal\n"
+
+#. Plugin Name of the plugin
+#: woocommerce-customer-portal.php
+msgid "WooCommerce Customer Portal"
+msgstr ""
+
+#. Plugin URI of the plugin
+#: woocommerce-customer-portal.php
+msgid "https://github.com/dhananjaysingh/woocommerce-customer-portal"
+msgstr ""
+
+#. Description of the plugin
+#: woocommerce-customer-portal.php
+msgid "A premium customer portal for WooCommerce — orders, addresses and account management in one polished, responsive interface. Add it to any page with the <code>[wcp_customer_portal]</code> shortcode."
+msgstr ""
+
+#. Author of the plugin
+#: woocommerce-customer-portal.php
+msgid "Dhananjay Singh"
+msgstr ""
+
+#. Author URI of the plugin
+#: woocommerce-customer-portal.php
+msgid "https://github.com/dhananjaysingh"
+msgstr ""
+
+#: admin/class-wcp-admin.php:95
+msgid "Documentation"
+msgstr ""
+
+#: admin/class-wcp-admin.php:107
+msgid "Settings"
+msgstr ""
+
+#: admin/class-wcp-admin.php:158
+msgid "Customer Portal:"
+msgstr ""
+
+#: admin/class-wcp-admin.php:159
+msgid "the selected portal page no longer exists or is not published."
+msgstr ""
+
+#: admin/class-wcp-admin.php:161
+msgid "Choose a page"
+msgstr ""
+
+#: admin/class-wcp-admin.php:182
+msgid "Add the portal to any page with"
+msgstr ""
+
+#: admin/class-wcp-admin.php:184
+msgid "Copy shortcode"
+msgstr ""
+
+#: admin/class-wcp-admin.php:185
+msgid "Copied"
+msgstr ""
+
+#: admin/class-wcp-settings-page.php:43
+#: admin/class-wcp-settings-page.php:44
+#: admin/views/settings-page.php:34
+msgid "Customer Portal"
+msgstr ""
+
+#: admin/class-wcp-settings-page.php:85
+msgid "You do not have permission to manage these settings."
+msgstr ""
+
+#. translators: %d: page ID.
+#: admin/class-wcp-settings-page.php:166
+#, php-format
+msgid "(no title) #%d"
+msgstr ""
+
+#: admin/class-wcp-settings-page.php:173
+msgid "— has portal shortcode"
+msgstr ""
+
+#: admin/class-wcp-settings-page.php:189
+msgid "Follow the visitor’s system setting"
+msgstr ""
+
+#: admin/class-wcp-settings-page.php:190
+#: templates/partials/theme-toggle.php:35
+msgid "Light"
+msgstr ""
+
+#: admin/class-wcp-settings-page.php:191
+#: templates/partials/theme-toggle.php:39
+msgid "Dark"
+msgstr ""
+
+#: admin/class-wcp-settings-page.php:203
+#: public/class-wcp-theme.php:206
+msgid "Aurora"
+msgstr ""
+
+#: admin/class-wcp-settings-page.php:204
+msgid "Violet and indigo accents on clean surfaces, with a soft blue-violet glow."
+msgstr ""
+
+#: admin/class-wcp-settings-page.php:207
+#: public/class-wcp-theme.php:207
+msgid "Obsidian"
+msgstr ""
+
+#: admin/class-wcp-settings-page.php:208
+msgid "Graphite and charcoal with restrained violet-blue highlights."
+msgstr ""
+
+#: admin/class-wcp-settings-page.php:211
+#: public/class-wcp-theme.php:208
+msgid "Pearl"
+msgstr ""
+
+#: admin/class-wcp-settings-page.php:212
+msgid "Warm near-white surfaces, neutral shadows and a quiet blue accent."
+msgstr ""
+
+#: admin/class-wcp-settings-page.php:215
+#: public/class-wcp-theme.php:209
+msgid "Midnight"
+msgstr ""
+
+#: admin/class-wcp-settings-page.php:216
+msgid "Deep navy surfaces lit by a cobalt and indigo glow."
+msgstr ""
+
+#: admin/class-wcp-settings-page.php:219
+#: public/class-wcp-theme.php:210
+msgid "Emerald"
+msgstr ""
+
+#: admin/class-wcp-settings-page.php:220
+msgid "Charcoal with a forest undertone and an emerald accent."
+msgstr ""
+
+#: admin/class-wcp-settings-page.php:246
+msgid "No page selected. The portal still renders wherever the shortcode appears; selecting a page here lets the plugin warn you if that page ever stops working."
+msgstr ""
+
+#: admin/class-wcp-settings-page.php:255
+msgid "The selected page no longer exists or is not published. Choose another page, or clear the selection."
+msgstr ""
+
+#. translators: %s: the portal shortcode.
+#: admin/class-wcp-settings-page.php:264
+#, php-format
+msgid "That page does not contain the %s shortcode, so the portal will not appear on it. Add the shortcode to the page, or select a different one."
+msgstr ""
+
+#: admin/class-wcp-settings-page.php:272
+msgid "This page contains the portal shortcode."
+msgstr ""
+
+#: admin/views/settings-page.php:36
+msgid "Control what customers see in the portal, which page hosts it, and how it looks."
+msgstr ""
+
+#: admin/views/settings-page.php:47
+msgid "Availability"
+msgstr ""
+
+#: admin/views/settings-page.php:48
+msgid "Whether the portal renders at all, and which page hosts it."
+msgstr ""
+
+#: admin/views/settings-page.php:53
+msgid "Portal"
+msgstr ""
+
+#: admin/views/settings-page.php:63
+msgid "Enable the customer portal"
+msgstr ""
+
+#: admin/views/settings-page.php:66
+msgid "When disabled, the shortcode renders nothing for customers. Store managers see a short notice in its place so the page is not mistaken for empty."
+msgstr ""
+
+#: admin/views/settings-page.php:73
+msgid "Portal page"
+msgstr ""
+
+#: admin/views/settings-page.php:77
+msgid "— Detect automatically —"
+msgstr ""
+
+#. translators: %s: the portal shortcode.
+#: admin/views/settings-page.php:94
+#, php-format
+msgid "The portal appears on any page containing %s. Selecting the page here does not change that page; it only lets the plugin check the page is still valid."
+msgstr ""
+
+#: admin/views/settings-page.php:107
+msgid "Sections"
+msgstr ""
+
+#: admin/views/settings-page.php:108
+msgid "Which parts of the portal customers can use. A disabled section is removed from the navigation and cannot be reached by URL."
+msgstr ""
+
+#: admin/views/settings-page.php:113
+#: admin/views/settings-page.php:116
+msgid "Enabled sections"
+msgstr ""
+
+#: admin/views/settings-page.php:131
+msgid "At least one section must stay enabled. If none are selected, all sections are restored on save."
+msgstr ""
+
+#: admin/views/settings-page.php:138
+msgid "Landing section"
+msgstr ""
+
+#: admin/views/settings-page.php:153
+msgid "Where customers land when they open the portal. If this section is later disabled, the portal falls back to Dashboard, then to the first enabled section."
+msgstr ""
+
+#: admin/views/settings-page.php:163
+#: templates/partials/theme-toggle.php:88
+msgid "Appearance"
+msgstr ""
+
+#: admin/views/settings-page.php:164
+msgid "The visual theme, the default colour scheme, the accent colour and motion."
+msgstr ""
+
+#: admin/views/settings-page.php:169
+#: admin/views/settings-page.php:172
+msgid "Default visual theme"
+msgstr ""
+
+#: admin/views/settings-page.php:198
+msgid "The theme every visitor starts with. A customer who picks a theme in the portal keeps their choice; it is stored in their browser and never on the server."
+msgstr ""
+
+#: admin/views/settings-page.php:205
+msgid "Accent colour"
+msgstr ""
+
+#: admin/views/settings-page.php:225
+#: templates/login-required.php:139
+msgid "Sign in"
+msgstr ""
+
+#. translators: %s: contrast ratio, e.g. 5.9.
+#: admin/views/settings-page.php:232
+#, php-format
+msgid "%s:1 contrast"
+msgstr ""
+
+#: admin/views/settings-page.php:239
+msgid "Used for buttons, links and the active navigation item in every visual theme. Leave it at the default and each theme uses its own accent; change it and the colour you choose overrides all three. Button text switches between white and near-black automatically to stay readable; a ratio under 4.5:1 means neither option reaches WCAG AA on this colour."
+msgstr ""
+
+#: admin/views/settings-page.php:246
+msgid "Default colour scheme"
+msgstr ""
+
+#: admin/views/settings-page.php:257
+msgid "A customer who has chosen a scheme with the switcher in the portal keeps their choice. This setting applies to everyone who has not."
+msgstr ""
+
+#: admin/views/settings-page.php:263
+msgid "Premium motion"
+msgstr ""
+
+#: admin/views/settings-page.php:273
+msgid "Enable entrance animations, section transitions and ambient motion"
+msgstr ""
+
+#: admin/views/settings-page.php:276
+msgid "Visitors who have asked their device for reduced motion never see these, whatever this setting says. Switch it off to give everyone the still version."
+msgstr ""
+
+#: admin/views/settings-page.php:282
+msgid "3D card effects"
+msgstr ""
+
+#: admin/views/settings-page.php:292
+msgid "Tilt selected cards towards the pointer with a subtle depth effect"
+msgstr ""
+
+#: admin/views/settings-page.php:295
+msgid "Desktop only: the effect activates on devices with a mouse or trackpad and never on touch screens. Forms never tilt while a field is being edited."
+msgstr ""
+
+#: admin/views/settings-page.php:302
+#: templates/profile.php:158
+msgid "Save changes"
+msgstr ""
+
+#. translators: 1: required PHP version, 2: current PHP version.
+#: includes/class-wcp-activator.php:58
+#, php-format
+msgid "WooCommerce Customer Portal requires PHP %1$s or newer. This site is running PHP %2$s."
+msgstr ""
+
+#. translators: 1: required WordPress version, 2: current WordPress version.
+#: includes/class-wcp-activator.php:65
+#, php-format
+msgid "WooCommerce Customer Portal requires WordPress %1$s or newer. This site is running WordPress %2$s."
+msgstr ""
+
+#: includes/class-wcp-activator.php:79
+msgid "Plugin activation failed"
+msgstr ""
+
+#. translators: 1: required PHP version, 2: current PHP version.
+#: includes/class-wcp-helper.php:75
+#, php-format
+msgid "This plugin requires PHP %1$s or newer. This site is running PHP %2$s."
+msgstr ""
+
+#. translators: 1: required WordPress version, 2: current WordPress version.
+#: includes/class-wcp-helper.php:83
+#, php-format
+msgid "This plugin requires WordPress %1$s or newer. This site is running WordPress %2$s."
+msgstr ""
+
+#. translators: 1: required WooCommerce version, 2: current WooCommerce version.
+#: includes/class-wcp-helper.php:91
+#, php-format
+msgid "This plugin requires WooCommerce %1$s or newer. This site is running WooCommerce %2$s."
+msgstr ""
+
+#: includes/class-wcp-helper.php:98
+msgid "WooCommerce must be installed and active. The customer portal stays disabled until it is available."
+msgstr ""
+
+#: includes/class-wcp-helper.php:115
+msgid "WooCommerce Customer Portal:"
+msgstr ""
+
+#: includes/class-wcp-loader.php:147
+msgid "WooCommerce Customer Portal is inactive."
+msgstr ""
+
+#: includes/class-wcp-loader.php:148
+msgid "WooCommerce must be installed and active for the portal to render. Only site administrators can see this message."
+msgstr ""
+
+#: includes/class-wcp-rate-limit.php:112
+msgid "Too many attempts. Please wait a moment and try again."
+msgstr ""
+
+#: public/class-wcp-account.php:83
+msgid "Customer"
+msgstr ""
+
+#. translators: compact month and year, e.g. "Sep 2026". Uses PHP date() format codes.
+#: public/class-wcp-account.php:156
+msgctxt "compact member-since date format"
+msgid "M Y"
+msgstr ""
+
+#: public/class-wcp-addresses.php:60
+#: templates/partials/account-health.php:55
+#: templates/partials/dashboard-actions.php:64
+#: templates/partials/portal-footer.php:188
+msgid "Shipping address"
+msgstr ""
+
+#: public/class-wcp-addresses.php:61
+#: templates/partials/account-health.php:45
+#: templates/partials/dashboard-actions.php:55
+#: templates/partials/portal-footer.php:187
+msgid "Billing address"
+msgstr ""
+
+#: public/class-wcp-addresses.php:325
+#: public/class-wcp-form-handler.php:170
+#: rest/class-wcp-rest-account.php:483
+msgid "Unknown address type."
+msgstr ""
+
+#: public/class-wcp-addresses.php:335
+#: public/class-wcp-form-handler.php:83
+#: public/class-wcp-profile.php:121
+#: rest/class-wcp-rest-account.php:109
+msgid "You must be signed in to do that."
+msgstr ""
+
+#: public/class-wcp-addresses.php:360
+msgid "Address editing is unavailable right now."
+msgstr ""
+
+#. translators: %s: field label.
+#: public/class-wcp-addresses.php:376
+#, php-format
+msgid "%s is required."
+msgstr ""
+
+#: public/class-wcp-addresses.php:395
+#: public/class-wcp-profile.php:378
+msgid "Please correct the highlighted field."
+msgid_plural "Please correct the highlighted fields."
+msgstr[0] ""
+msgstr[1] ""
+
+#. translators: %s: field label.
+#: public/class-wcp-addresses.php:481
+#, php-format
+msgid "Choose a valid %s."
+msgstr ""
+
+#: public/class-wcp-addresses.php:487
+#: public/class-wcp-profile.php:265
+msgid "That email address does not look valid."
+msgstr ""
+
+#: public/class-wcp-addresses.php:492
+msgid "That postcode is not valid for the selected country."
+msgstr ""
+
+#: public/class-wcp-addresses.php:498
+msgid "That phone number does not look valid."
+msgstr ""
+
+#. translators: %s: order number.
+#: public/class-wcp-dashboard.php:465
+#, php-format
+msgid "Order #%s placed"
+msgstr ""
+
+#. translators: %s: order number.
+#: public/class-wcp-dashboard.php:471
+#, php-format
+msgid "Payment received for #%s"
+msgstr ""
+
+#. translators: %s: order number.
+#: public/class-wcp-dashboard.php:477
+#, php-format
+msgid "Order #%s completed"
+msgstr ""
+
+#. translators: %s: human-readable time difference, e.g. "2 days".
+#: public/class-wcp-dashboard.php:514
+#, php-format
+msgid "%s ago"
+msgstr ""
+
+#: public/class-wcp-form-handler.php:89
+#: public/class-wcp-public.php:222
+#: rest/class-wcp-rest-account.php:177
+msgid "Your session has expired. Refresh the page and try again."
+msgstr ""
+
+#: public/class-wcp-form-handler.php:100
+#: rest/class-wcp-rest-account.php:129
+#: rest/class-wcp-rest-orders.php:120
+msgid "That part of the portal is not available."
+msgstr ""
+
+#: public/class-wcp-form-handler.php:152
+#: rest/class-wcp-rest-account.php:232
+msgid "Profile updated."
+msgstr ""
+
+#. translators: %s: address label, e.g. "Billing address".
+#: public/class-wcp-form-handler.php:205
+#: rest/class-wcp-rest-account.php:336
+#, php-format
+msgid "%s saved."
+msgstr ""
+
+#: public/class-wcp-navigation.php:145
+#: public/class-wcp-navigation.php:146
+msgid "Dashboard"
+msgstr ""
+
+#: public/class-wcp-navigation.php:147
+msgid "An overview of your account."
+msgstr ""
+
+#: public/class-wcp-navigation.php:151
+msgid "Your account at a glance."
+msgstr ""
+
+#: public/class-wcp-navigation.php:157
+#: public/class-wcp-navigation.php:158
+#: templates/partials/portal-footer.php:205
+msgid "Orders"
+msgstr ""
+
+#: public/class-wcp-navigation.php:159
+msgid "Track purchases and review order history."
+msgstr ""
+
+#: public/class-wcp-navigation.php:163
+msgid "Review past purchases and open any order for full details."
+msgstr ""
+
+#: public/class-wcp-navigation.php:164
+msgid "Track every order"
+msgstr ""
+
+#: public/class-wcp-navigation.php:165
+msgid "Follow each purchase from checkout to your doorstep."
+msgstr ""
+
+#: public/class-wcp-navigation.php:169
+#: public/class-wcp-navigation.php:170
+msgid "Addresses"
+msgstr ""
+
+#: public/class-wcp-navigation.php:171
+msgid "Manage billing and shipping details."
+msgstr ""
+
+#: public/class-wcp-navigation.php:175
+msgid "Keep billing and shipping addresses current for faster checkout."
+msgstr ""
+
+#: public/class-wcp-navigation.php:176
+msgid "Manage billing & shipping"
+msgstr ""
+
+#: public/class-wcp-navigation.php:177
+msgid "Save your addresses once and check out faster every time."
+msgstr ""
+
+#: public/class-wcp-navigation.php:181
+#: public/class-wcp-navigation.php:182
+#: templates/partials/account-health.php:67
+#: templates/partials/dashboard-status.php:125
+msgid "Profile"
+msgstr ""
+
+#: public/class-wcp-navigation.php:183
+msgid "Update your personal and sign-in details."
+msgstr ""
+
+#: public/class-wcp-navigation.php:187
+msgid "Change your name, email address and account password."
+msgstr ""
+
+#: public/class-wcp-navigation.php:188
+msgid "Keep your profile secure"
+msgstr ""
+
+#: public/class-wcp-navigation.php:189
+msgid "Update your details and password whenever you need to."
+msgstr ""
+
+#: public/class-wcp-order-status.php:211
+msgid "Order placed"
+msgstr ""
+
+#: public/class-wcp-order-status.php:212
+msgid "Processing"
+msgstr ""
+
+#: public/class-wcp-order-status.php:213
+msgid "Completed"
+msgstr ""
+
+#: public/class-wcp-orders.php:139
+#: public/class-wcp-orders.php:145
+#: public/class-wcp-orders.php:152
+#: templates/partials/order-error.php:19
+msgid "That order could not be found."
+msgstr ""
+
+#. translators: %s: number of items in an order.
+#: public/class-wcp-orders.php:219
+#, php-format
+msgid "%s item"
+msgid_plural "%s items"
+msgstr[0] ""
+msgstr[1] ""
+
+#. translators: %s: number of further items in an order.
+#: public/class-wcp-orders.php:418
+#, php-format
+msgid "+%s more"
+msgid_plural "+%s more"
+msgstr[0] ""
+msgstr[1] ""
+
+#: public/class-wcp-profile.php:50
+msgid "First name"
+msgstr ""
+
+#: public/class-wcp-profile.php:56
+msgid "Last name"
+msgstr ""
+
+#: public/class-wcp-profile.php:62
+msgid "Display name"
+msgstr ""
+
+#: public/class-wcp-profile.php:65
+msgid "How your name appears across the store."
+msgstr ""
+
+#: public/class-wcp-profile.php:69
+msgid "Email address"
+msgstr ""
+
+#: public/class-wcp-profile.php:72
+msgid "Used for order updates and signing in."
+msgstr ""
+
+#. translators: %s: field label.
+#: public/class-wcp-profile.php:149
+#, php-format
+msgid "%s cannot be empty."
+msgstr ""
+
+#: public/class-wcp-profile.php:282
+msgid "That email address is already in use."
+msgstr ""
+
+#: public/class-wcp-profile.php:327
+msgid "Enter your current password to change it."
+msgstr ""
+
+#: public/class-wcp-profile.php:331
+msgid "That is not your current password."
+msgstr ""
+
+#: public/class-wcp-profile.php:335
+msgid "Enter a new password."
+msgstr ""
+
+#. translators: %d: minimum number of characters.
+#: public/class-wcp-profile.php:339
+#, php-format
+msgid "Use at least %d characters."
+msgstr ""
+
+#: public/class-wcp-profile.php:345
+msgid "Passwords cannot contain a backslash."
+msgstr ""
+
+#: public/class-wcp-profile.php:349
+msgid "The two passwords do not match."
+msgstr ""
+
+#: public/class-wcp-public.php:219
+#: templates/partials/header.php:29
+msgid "Open navigation menu"
+msgstr ""
+
+#: public/class-wcp-public.php:220
+#: templates/partials/sidebar.php:41
+msgid "Close navigation menu"
+msgstr ""
+
+#: public/class-wcp-public.php:221
+msgid "Could not reach the server. Check your connection and try again."
+msgstr ""
+
+#: public/class-wcp-public.php:223
+#: templates/partials/field.php:87
+msgid "Select…"
+msgstr ""
+
+#: public/class-wcp-shortcodes.php:141
+msgid "The customer portal is switched off."
+msgstr ""
+
+#: public/class-wcp-shortcodes.php:142
+msgid "Customers see nothing here. Only store managers can see this message."
+msgstr ""
+
+#: public/class-wcp-shortcodes.php:144
+msgid "Portal settings"
+msgstr ""
+
+#: rest/class-wcp-rest-account.php:117
+msgid "You do not have permission to do that."
+msgstr ""
+
+#: rest/class-wcp-rest-orders.php:67
+msgid "Order ID."
+msgstr ""
+
+#: rest/class-wcp-rest-orders.php:101
+msgid "You must be signed in to view orders."
+msgstr ""
+
+#: rest/class-wcp-rest-orders.php:109
+msgid "You do not have permission to view this."
+msgstr ""
+
+#: rest/class-wcp-rest-orders.php:323
+msgid "Page of orders to return."
+msgstr ""
+
+#: rest/class-wcp-rest-orders.php:331
+msgid "Orders per page."
+msgstr ""
+
+#: templates/address-edit.php:48
+msgid "Back to addresses"
+msgstr ""
+
+#: templates/address-edit.php:71
+msgid "Fields follow the conventions of the country you choose."
+msgstr ""
+
+#: templates/address-edit.php:115
+msgid "Cancel"
+msgstr ""
+
+#: templates/address-edit.php:118
+msgid "Save address"
+msgstr ""
+
+#: templates/addresses.php:23
+msgid "Where your invoices and payment receipts are addressed."
+msgstr ""
+
+#: templates/addresses.php:24
+msgid "Where your orders are delivered by default."
+msgstr ""
+
+#: templates/addresses.php:31
+#: templates/partials/dashboard-status.php:106
+msgid "Saved addresses"
+msgstr ""
+
+#: templates/addresses.php:32
+msgid "These are used to prefill checkout. You can change them at any time."
+msgstr ""
+
+#: templates/addresses.php:67
+msgid "Saved"
+msgstr ""
+
+#: templates/addresses.php:67
+msgid "Empty"
+msgstr ""
+
+#: templates/addresses.php:81
+msgid "Not set yet"
+msgstr ""
+
+#: templates/addresses.php:83
+msgid "Add this address once and checkout will fill it in for you."
+msgstr ""
+
+#. translators: %s: address label, e.g. "Billing address".
+#: templates/addresses.php:95
+#, php-format
+msgid "Edit %s"
+msgstr ""
+
+#. translators: %s: address label, e.g. "Billing address".
+#: templates/addresses.php:101
+#, php-format
+msgid "Add %s"
+msgstr ""
+
+#: templates/addresses.php:117
+msgid "Used at checkout"
+msgstr ""
+
+#: templates/addresses.php:118
+msgid "Both addresses are filled in for you on your next order."
+msgstr ""
+
+#: templates/addresses.php:124
+msgid "Formatted per country"
+msgstr ""
+
+#: templates/addresses.php:125
+msgid "Fields and layout follow the conventions of the country you pick."
+msgstr ""
+
+#: templates/addresses.php:131
+msgid "Only you can change them"
+msgstr ""
+
+#: templates/addresses.php:132
+msgid "Edits are saved to your account and never shared with other customers."
+msgstr ""
+
+#: templates/dashboard.php:67
+msgid "Account created"
+msgstr ""
+
+#. translators: %s: registration date.
+#: templates/dashboard.php:71
+#, php-format
+msgid "Joined %s"
+msgstr ""
+
+#: templates/dashboard.php:74
+msgid "Your account is active."
+msgstr ""
+
+#: templates/dashboard.php:75
+msgid "Your account is ready to use."
+msgstr ""
+
+#: templates/dashboard.php:80
+msgid "Complete your profile"
+msgstr ""
+
+#: templates/dashboard.php:81
+msgid "Add your name so orders are addressed correctly."
+msgstr ""
+
+#: templates/dashboard.php:82
+msgid "Add your name to finish setting up your profile."
+msgstr ""
+
+#: templates/dashboard.php:87
+msgid "Add a billing address"
+msgstr ""
+
+#: templates/dashboard.php:88
+msgid "Saved once, filled in at every checkout."
+msgstr ""
+
+#: templates/dashboard.php:89
+msgid "Add a billing address to make checkout faster."
+msgstr ""
+
+#: templates/dashboard.php:94
+msgid "Add a shipping address"
+msgstr ""
+
+#: templates/dashboard.php:95
+msgid "Where your orders should be delivered."
+msgstr ""
+
+#: templates/dashboard.php:96
+msgid "Add a shipping address so deliveries reach you."
+msgstr ""
+
+#: templates/dashboard.php:101
+msgid "Place your first order"
+msgstr ""
+
+#: templates/dashboard.php:102
+msgid "Your purchases will appear in this portal."
+msgstr ""
+
+#: templates/dashboard.php:103
+msgid "When you place your first order it will appear here."
+msgstr ""
+
+#: templates/dashboard.php:131
+msgid "Your account details are up to date."
+msgstr ""
+
+#: templates/login-required.php:84
+#: templates/partials/portal-footer.php:232
+#: templates/partials/sidebar.php:23
+#: templates/partials/sidebar.php:34
+msgid "Customer portal"
+msgstr ""
+
+#: templates/login-required.php:89
+msgid "Your account,"
+msgstr ""
+
+#: templates/login-required.php:90
+msgid "beautifully organised."
+msgstr ""
+
+#: templates/login-required.php:94
+msgid "Track orders, manage addresses and keep your account details up to date — without hunting through email receipts."
+msgstr ""
+
+#: templates/login-required.php:130
+msgid "Welcome back"
+msgstr ""
+
+#: templates/login-required.php:134
+msgid "Sign in to access your customer portal."
+msgstr ""
+
+#: templates/login-required.php:148
+msgid "New here?"
+msgstr ""
+
+#: templates/login-required.php:150
+msgid "Create an account"
+msgstr ""
+
+#: templates/login-required.php:157
+msgid "Protected by your store’s secure WooCommerce sign-in. We never see your password."
+msgstr ""
+
+#: templates/order-detail.php:42
+#: templates/partials/order-error.php:40
+msgid "Back to orders"
+msgstr ""
+
+#: templates/order-detail.php:52
+msgid "Order summary"
+msgstr ""
+
+#. translators: %s: order number.
+#: templates/order-detail.php:57
+#: templates/partials/dashboard-orders.php:64
+#, php-format
+msgid "Order #%s"
+msgstr ""
+
+#: templates/order-detail.php:72
+msgid "Order date"
+msgstr ""
+
+#: templates/order-detail.php:82
+#: templates/order-detail.php:118
+#: templates/orders.php:104
+#: templates/orders.php:154
+msgid "Items"
+msgstr ""
+
+#: templates/order-detail.php:86
+msgid "Order total"
+msgstr ""
+
+#: templates/order-detail.php:103
+msgid "(current status)"
+msgstr ""
+
+#. translators: %s: product SKU.
+#: templates/order-detail.php:152
+#, php-format
+msgid "SKU: %s"
+msgstr ""
+
+#: templates/order-detail.php:192
+msgid "Downloads"
+msgstr ""
+
+#: templates/order-detail.php:193
+msgid "Files included with this order."
+msgstr ""
+
+#. translators: %s: number of downloads remaining.
+#: templates/order-detail.php:211
+#, php-format
+msgid "%s downloads remaining"
+msgstr ""
+
+#. translators: %s: expiry date.
+#: templates/order-detail.php:220
+#, php-format
+msgid "Expires %s"
+msgstr ""
+
+#: templates/order-detail.php:229
+msgid "Download"
+msgstr ""
+
+#: templates/order-detail.php:244
+msgid "Shipping"
+msgstr ""
+
+#: templates/order-detail.php:245
+msgid "Where this order was sent."
+msgstr ""
+
+#: templates/order-detail.php:255
+msgid "No shipping address on this order."
+msgstr ""
+
+#: templates/order-detail.php:271
+msgid "Billing & payment"
+msgstr ""
+
+#: templates/order-detail.php:272
+msgid "Invoice address and payment method."
+msgstr ""
+
+#: templates/order-detail.php:282
+msgid "No billing address on this order."
+msgstr ""
+
+#: templates/order-detail.php:300
+msgid "Your note"
+msgstr ""
+
+#: templates/orders.php:48
+msgid "No orders yet"
+msgstr ""
+
+#: templates/orders.php:52
+msgid "Your purchases will appear here once you place your first order."
+msgstr ""
+
+#: templates/orders.php:58
+#: templates/partials/dashboard-actions.php:28
+#: templates/partials/portal-footer.php:143
+msgid "Browse store"
+msgstr ""
+
+#: templates/orders.php:81
+msgid "Order history"
+msgstr ""
+
+#. translators: %s: total number of orders.
+#: templates/orders.php:86
+#, php-format
+msgid "%s order in your account."
+msgid_plural "%s orders in your account."
+msgstr[0] ""
+msgstr[1] ""
+
+#: templates/orders.php:101
+#: templates/orders.php:119
+msgid "Order"
+msgstr ""
+
+#: templates/orders.php:102
+#: templates/orders.php:133
+msgid "Date"
+msgstr ""
+
+#: templates/orders.php:103
+#: templates/orders.php:144
+msgid "Status"
+msgstr ""
+
+#: templates/orders.php:105
+#: templates/orders.php:162
+msgid "Total"
+msgstr ""
+
+#. translators: %s: order number.
+#: templates/orders.php:125
+#, php-format
+msgid "#%s"
+msgstr ""
+
+#: templates/orders.php:170
+msgid "View order"
+msgstr ""
+
+#: templates/orders.php:196
+msgid "Orders pages"
+msgstr ""
+
+#: templates/orders.php:200
+#: templates/orders.php:205
+msgid "Previous"
+msgstr ""
+
+#. translators: 1: current page number, 2: total number of pages.
+#: templates/orders.php:213
+#, php-format
+msgid "Page %1$s of %2$s"
+msgstr ""
+
+#: templates/orders.php:222
+#: templates/orders.php:227
+#: templates/partials/dashboard-setup.php:72
+msgid "Next"
+msgstr ""
+
+#: templates/partials/account-health.php:47
+#: templates/partials/account-health.php:57
+#: templates/partials/portal-footer.php:195
+msgid "Added"
+msgstr ""
+
+#: templates/partials/account-health.php:48
+#: templates/partials/account-health.php:58
+#: templates/partials/portal-footer.php:196
+msgid "Missing"
+msgstr ""
+
+#: templates/partials/account-health.php:69
+msgid "Review"
+msgstr ""
+
+#: templates/partials/account-health.php:70
+#: templates/partials/dashboard-status.php:128
+msgid "Complete"
+msgstr ""
+
+#: templates/partials/account-health.php:77
+#: templates/profile.php:182
+msgid "Password"
+msgstr ""
+
+#: templates/partials/account-health.php:78
+msgid "Manage"
+msgstr ""
+
+#: templates/partials/account-health.php:90
+msgid "Account health"
+msgstr ""
+
+#: templates/partials/account-health.php:91
+msgid "What checkout will use, and where to change it."
+msgstr ""
+
+#: templates/partials/account-health.php:133
+#: templates/partials/portal-footer.php:216
+#: templates/partials/theme-toggle.php:109
+msgid "Theme"
+msgstr ""
+
+#: templates/partials/account-health.php:146
+msgid "Continue shopping"
+msgstr ""
+
+#: templates/partials/dashboard-actions.php:37
+#: templates/partials/portal-footer.php:152
+msgid "View orders"
+msgstr ""
+
+#: templates/partials/dashboard-actions.php:46
+msgid "Manage profile"
+msgstr ""
+
+#: templates/partials/dashboard-actions.php:77
+msgid "Quick actions"
+msgstr ""
+
+#: templates/partials/dashboard-actions.php:78
+msgid "Everything you reach for most."
+msgstr ""
+
+#: templates/partials/dashboard-activity.php:26
+msgid "Recent activity"
+msgstr ""
+
+#: templates/partials/dashboard-activity.php:27
+msgid "Milestones WooCommerce recorded on your orders."
+msgstr ""
+
+#: templates/partials/dashboard-discovery.php:29
+msgid "Latest products"
+msgstr ""
+
+#: templates/partials/dashboard-discovery.php:30
+msgid "The newest additions to the store."
+msgstr ""
+
+#: templates/partials/dashboard-discovery.php:34
+#: templates/partials/portal-footer.php:50
+#: templates/partials/portal-footer.php:113
+msgid "Shop"
+msgstr ""
+
+#: templates/partials/dashboard-discovery.php:92
+msgid "Nothing published yet"
+msgstr ""
+
+#: templates/partials/dashboard-discovery.php:93
+msgid "New products will show up here as the store adds them."
+msgstr ""
+
+#: templates/partials/dashboard-discovery.php:97
+msgid "Visit the store"
+msgstr ""
+
+#: templates/partials/dashboard-hero.php:26
+msgid "Good morning"
+msgstr ""
+
+#: templates/partials/dashboard-hero.php:28
+msgid "Good afternoon"
+msgstr ""
+
+#: templates/partials/dashboard-hero.php:30
+msgid "Good evening"
+msgstr ""
+
+#. translators: %s: customer first name.
+#: templates/partials/dashboard-hero.php:47
+#, php-format
+msgid "Welcome back, %s."
+msgstr ""
+
+#. translators: %s: registration date.
+#: templates/partials/dashboard-hero.php:68
+#: templates/profile.php:88
+#, php-format
+msgid "Member since %s"
+msgstr ""
+
+#: templates/partials/dashboard-hero.php:87
+msgid "Customer account"
+msgstr ""
+
+#: templates/partials/dashboard-orders.php:33
+msgid "Recent orders"
+msgstr ""
+
+#: templates/partials/dashboard-orders.php:34
+msgid "Your latest purchases at a glance."
+msgstr ""
+
+#: templates/partials/dashboard-orders.php:38
+msgid "View all"
+msgstr ""
+
+#. translators: 1: completed steps, 2: total steps.
+#: templates/partials/dashboard-progress.php:31
+#: templates/partials/dashboard-setup.php:31
+#, php-format
+msgid "%1$s of %2$s complete"
+msgstr ""
+
+#: templates/partials/dashboard-progress.php:49
+#: templates/partials/dashboard-progress.php:64
+#: templates/partials/dashboard-setup.php:54
+msgid "Account setup"
+msgstr ""
+
+#: templates/partials/dashboard-setup.php:39
+msgid "Getting started"
+msgstr ""
+
+#: templates/partials/dashboard-setup.php:40
+msgid "A short list, and your account is ready for checkout."
+msgstr ""
+
+#: templates/partials/dashboard-setup.php:70
+msgid "Done"
+msgstr ""
+
+#: templates/partials/dashboard-setup.php:74
+msgid "To do"
+msgstr ""
+
+#: templates/partials/dashboard-skeleton.php:18
+msgid "Loading…"
+msgstr ""
+
+#. translators: %s: human-readable duration, e.g. "3 months".
+#: templates/partials/dashboard-status.php:59
+#, php-format
+msgid "Active for %s"
+msgstr ""
+
+#: templates/partials/dashboard-status.php:70
+msgid "Total orders"
+msgstr ""
+
+#: templates/partials/dashboard-status.php:73
+msgid "Across the lifetime of your account."
+msgstr ""
+
+#: templates/partials/dashboard-status.php:74
+msgid "No orders yet. Your purchases will appear here."
+msgstr ""
+
+#: templates/partials/dashboard-status.php:82
+msgid "Lifetime value"
+msgstr ""
+
+#: templates/partials/dashboard-status.php:84
+msgid "Total of your paid orders."
+msgstr ""
+
+#: templates/partials/dashboard-status.php:92
+msgid "Latest order"
+msgstr ""
+
+#. translators: 1: number of saved addresses, 2: total number of address types.
+#: templates/partials/dashboard-status.php:110
+#, php-format
+msgctxt "saved addresses count"
+msgid "%1$s of %2$s"
+msgstr ""
+
+#: templates/partials/dashboard-status.php:116
+msgid "Billing and shipping are ready for checkout."
+msgstr ""
+
+#: templates/partials/dashboard-status.php:117
+msgid "Save them once to speed up checkout."
+msgstr ""
+
+#: templates/partials/dashboard-status.php:129
+msgid "Needs attention"
+msgstr ""
+
+#: templates/partials/dashboard-status.php:133
+msgid "Add your name to finish it."
+msgstr ""
+
+#: templates/partials/dashboard-status.php:142
+msgid "Member since"
+msgstr ""
+
+#: templates/partials/dashboard-status.php:158
+msgid "Account overview"
+msgstr ""
+
+#: templates/partials/field.php:70
+msgid "(required)"
+msgstr ""
+
+#: templates/partials/field.php:72
+msgid "Optional"
+msgstr ""
+
+#: templates/partials/header.php:54
+#: templates/partials/portal-footer.php:71
+#: templates/partials/portal-footer.php:116
+msgid "My account"
+msgstr ""
+
+#: templates/partials/order-error.php:33
+msgid "Order unavailable"
+msgstr ""
+
+#: templates/partials/orders-skeleton.php:20
+msgid "Loading orders…"
+msgstr ""
+
+#: templates/partials/portal-footer.php:57
+msgid "Privacy"
+msgstr ""
+
+#: templates/partials/portal-footer.php:64
+msgid "Terms"
+msgstr ""
+
+#. translators: 1: year, 2: store name.
+#: templates/partials/portal-footer.php:77
+#, php-format
+msgctxt "portal footer copyright"
+msgid "© %1$s %2$s"
+msgstr ""
+
+#: templates/partials/portal-footer.php:114
+msgid "Cart"
+msgstr ""
+
+#: templates/partials/portal-footer.php:115
+msgid "Checkout"
+msgstr ""
+
+#: templates/partials/portal-footer.php:161
+msgid "Manage addresses"
+msgstr ""
+
+#: templates/partials/portal-footer.php:170
+msgid "Edit profile"
+msgstr ""
+
+#: templates/partials/portal-footer.php:235
+msgid "Manage your orders, addresses and account details securely, in one place."
+msgstr ""
+
+#: templates/partials/portal-footer.php:260
+msgid "Customer portal footer"
+msgstr ""
+
+#: templates/partials/portal-footer.php:263
+msgid "Account"
+msgstr ""
+
+#: templates/partials/portal-footer.php:294
+msgid "Store"
+msgstr ""
+
+#: templates/partials/portal-footer.php:318
+msgid "Account status"
+msgstr ""
+
+#: templates/partials/section-upcoming.php:39
+msgid "In development"
+msgstr ""
+
+#. translators: %s: section name, e.g. Orders.
+#: templates/partials/section-upcoming.php:45
+#, php-format
+msgid "%s is coming to the portal"
+msgstr ""
+
+#: templates/partials/section-upcoming.php:56
+msgid "Open in My Account"
+msgstr ""
+
+#: templates/partials/section-upcoming.php:60
+msgid "Back to dashboard"
+msgstr ""
+
+#: templates/partials/sidebar.php:46
+msgid "Portal sections"
+msgstr ""
+
+#: templates/partials/sidebar.php:47
+msgid "Menu"
+msgstr ""
+
+#: templates/partials/sidebar.php:80
+msgid "(preview)"
+msgstr ""
+
+#: templates/partials/sidebar.php:104
+msgid "Sign out"
+msgstr ""
+
+#: templates/partials/theme-toggle.php:31
+msgid "System"
+msgstr ""
+
+#: templates/partials/theme-toggle.php:45
+msgid "Violet and indigo"
+msgstr ""
+
+#: templates/partials/theme-toggle.php:46
+msgid "Graphite and charcoal"
+msgstr ""
+
+#: templates/partials/theme-toggle.php:47
+msgid "Warm and minimal"
+msgstr ""
+
+#: templates/partials/theme-toggle.php:48
+msgid "Deep navy and cobalt"
+msgstr ""
+
+#: templates/partials/theme-toggle.php:49
+msgid "Charcoal and emerald"
+msgstr ""
+
+#: templates/partials/theme-toggle.php:70
+#: templates/partials/theme-toggle.php:83
+msgid "Appearance and theme"
+msgstr ""
+
+#: templates/portal.php:49
+msgid "Skip to portal content"
+msgstr ""
+
+#: templates/profile.php:40
+msgid "Current password"
+msgstr ""
+
+#: templates/profile.php:44
+msgid "New password"
+msgstr ""
+
+#. translators: %d: minimum number of characters.
+#: templates/profile.php:47
+#, php-format
+msgid "At least %d characters."
+msgstr ""
+
+#: templates/profile.php:54
+msgid "Confirm new password"
+msgstr ""
+
+#: templates/profile.php:75
+msgid "Your profile"
+msgstr ""
+
+#: templates/profile.php:115
+msgid "Your details"
+msgstr ""
+
+#: templates/profile.php:116
+msgid "How your name and contact details appear across the store."
+msgstr ""
+
+#: templates/profile.php:183
+msgid "Changing your password signs you out everywhere else."
+msgstr ""
+
+#: templates/profile.php:227
+msgid "Update password"
+msgstr ""

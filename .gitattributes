@@ -1,0 +1,21 @@
+# Normalise line endings.
+* text=auto eol=lf
+*.png binary
+
+# `git archive` mirrors the release allowlist in scripts/build-plugin.sh:
+# nothing below is runtime.
+/.github          export-ignore
+/.gitattributes   export-ignore
+/.gitignore       export-ignore
+/docs             export-ignore
+/scripts          export-ignore
+/tests            export-ignore
+/composer.json    export-ignore
+/composer.lock    export-ignore
+/phpcs.xml.dist   export-ignore
+/phpstan.neon.dist export-ignore
+/phpunit.xml.dist export-ignore
+/phpunit-degraded.xml.dist export-ignore
+/CHANGELOG.md     export-ignore
+/README.md        export-ignore
+/rest/README.md   export-ignore

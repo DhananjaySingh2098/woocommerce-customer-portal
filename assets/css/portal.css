@@ -1,0 +1,6986 @@
+/*
+ * WooCommerce Customer Portal — portal stylesheet
+ *
+ * Everything is scoped under .wcp-portal so the plugin never leaks styles into
+ * a host theme, and so a host theme's own resets cannot reach in and undo the
+ * layout. Design tokens live on .wcp-portal rather than :root for the same
+ * reason: one container, one contained design system.
+ *
+ * Theming is two independent axes, both carried as attributes on <html> by the
+ * pre-paint head script:
+ *
+ *   data-wcp-visual = aurora | obsidian | pearl | midnight | emerald
+ *                                                 (a token set: the "theme")
+ *   data-wcp-theme  = light | dark                (the "appearance")
+ *
+ * Section 1 defines the token contract and the Aurora light values. Section
+ * 22 defines every other preset/appearance pair as token overrides only.
+ * No component rule is ever written per theme.
+ *
+ * Sections
+ *   1.  Design tokens (contract + Aurora light)
+ *   2.  Scoped reset
+ *   3.  Accessibility utilities
+ *   4.  Motion system (keyframes, entrance, stagger, section transition)
+ *   5.  Depth system (card physics, 3D tilt, spotlight)
+ *   6.  Shell layout
+ *   7.  Sidebar
+ *   8.  Header + appearance switcher
+ *   9.  Primitives (buttons, avatar, pills, status)
+ *   10. Panels, sections, grids
+ *   11. Empty states
+ *   12. Full-bleed layout
+ *   13. Ambient canvas
+ *   14. Logged-out gate
+ *   15. Orders
+ *   16. Order detail
+ *   17. Forms & account
+ *   18. Dashboard
+ *   19. Portal footer
+ *   20. Responsive
+ *   21. Reduced motion, print, forced colors
+ *   22. Presets and dark appearance
+ */
+
+/* ==========================================================================
+   1. Design tokens
+   ========================================================================== */
+
+.wcp-portal {
+	/*
+	 * --- Preset-level tokens (the contract every preset fills in) ---------
+	 * A preset sets these and nothing else. Aurora light is the baseline.
+	 */
+	--wcp-bg: #f3f4fa;
+	--wcp-bg-elevated: #f9f9fd;
+	--wcp-bg-subtle: #eceef6;
+	--wcp-surface: #ffffff;
+	--wcp-surface-raised: #ffffff;
+	--wcp-surface-hover: #f7f7fc;
+	--wcp-surface-tint: #fbfbfe;
+	--wcp-surface-blur: rgba(255, 255, 255, 0.72);
+	--wcp-veil: rgba(255, 255, 255, 0.66);
+	--wcp-grid-line: rgba(30, 32, 72, 0.045);
+	--wcp-highlight: rgba(255, 255, 255, 0.85);
+
+	--wcp-text: #14172b;
+	--wcp-text-strong: #0b0d1c;
+	--wcp-muted: #4c5370;
+	--wcp-muted-soft: #636b88;
+
+	--wcp-border: rgba(22, 25, 60, 0.085);
+	--wcp-border-strong: rgba(22, 25, 60, 0.16);
+
+	--wcp-accent: #5b4ce0;
+	--wcp-accent-hover: #4d3fd0;
+	--wcp-accent-active: #4234b5;
+	--wcp-accent-soft: #eeecfd;
+	--wcp-accent-soft-hover: #e3e0fb;
+	--wcp-accent-contrast: #ffffff;
+	--wcp-accent-rgb: 91, 76, 224;
+	--wcp-accent-2-rgb: 56, 132, 224;
+
+	--wcp-success: #0d7a58;
+	--wcp-success-soft: #e2f4ec;
+	--wcp-info: #1f5fa9;
+	--wcp-info-soft: #e6effb;
+	--wcp-warning: #8a5a00;
+	--wcp-warning-soft: #fdf1da;
+	--wcp-danger: #a3282d;
+	--wcp-danger-soft: #fde9e9;
+	--wcp-neutral: #5b6578;
+	--wcp-neutral-soft: #eceef3;
+
+	--wcp-shadow-color: 20, 22, 60;
+	--wcp-shadow-xs: 0 1px 2px rgba(var(--wcp-shadow-color), 0.05);
+	--wcp-shadow-sm: 0 1px 2px rgba(var(--wcp-shadow-color), 0.05), 0 2px 6px -2px rgba(var(--wcp-shadow-color), 0.06);
+	--wcp-shadow-md: 0 2px 4px -2px rgba(var(--wcp-shadow-color), 0.06), 0 10px 24px -12px rgba(var(--wcp-shadow-color), 0.14);
+	--wcp-shadow-lg: 0 4px 10px -4px rgba(var(--wcp-shadow-color), 0.08), 0 24px 44px -18px rgba(var(--wcp-shadow-color), 0.2);
+	--wcp-shadow-xl: 0 10px 20px -10px rgba(var(--wcp-shadow-color), 0.1), 0 40px 70px -24px rgba(var(--wcp-shadow-color), 0.26);
+	--wcp-shadow-3d: 0 30px 60px -28px rgba(var(--wcp-shadow-color), 0.3), 0 18px 32px -20px rgba(var(--wcp-accent-rgb), 0.22);
+	--wcp-glow: 0 0 0 1px rgba(var(--wcp-accent-rgb), 0.14), 0 12px 32px -12px rgba(var(--wcp-accent-rgb), 0.45);
+	--wcp-inset-highlight: inset 0 1px 0 var(--wcp-highlight);
+	--wcp-ring: 0 0 0 3px rgba(var(--wcp-accent-rgb), 0.24);
+
+	/* Ambient canvas washes. */
+	--wcp-wash-a: rgba(var(--wcp-accent-rgb), 0.16);
+	--wcp-wash-b: rgba(var(--wcp-accent-2-rgb), 0.12);
+	--wcp-wash-c: rgba(236, 72, 153, 0.06);
+
+	/*
+	 * --- Derived tokens (never set by a preset) ----------------------------
+	 * Component rules use `--wcp-primary*`; presets speak in `--wcp-accent*`.
+	 * The administrator's custom accent is printed as `--wcp-primary*` on this
+	 * same element after the stylesheet, so it wins over any preset without
+	 * a specificity contest. That is the documented precedence:
+	 * preset accent → admin custom accent → customer appearance.
+	 */
+	--wcp-primary: var(--wcp-accent);
+	--wcp-primary-hover: var(--wcp-accent-hover);
+	--wcp-primary-active: var(--wcp-accent-active);
+	--wcp-primary-soft: var(--wcp-accent-soft);
+	--wcp-primary-soft-hover: var(--wcp-accent-soft-hover);
+	--wcp-primary-contrast: var(--wcp-accent-contrast);
+	--wcp-primary-rgb: var(--wcp-accent-rgb);
+
+	/* Radii — rounded, not pillowy. */
+	--wcp-radius-xs: 6px;
+	--wcp-radius-sm: 9px;
+	--wcp-radius-md: 12px;
+	--wcp-radius-lg: 16px;
+	--wcp-radius-xl: 22px;
+	--wcp-radius: var(--wcp-radius-lg);
+	--wcp-radius-full: 999px;
+
+	/* Spacing — 4px base */
+	--wcp-space-1: 4px;
+	--wcp-space-2: 8px;
+	--wcp-space-3: 12px;
+	--wcp-space-4: 16px;
+	--wcp-space-5: 20px;
+	--wcp-space-6: 24px;
+	--wcp-space-7: 32px;
+	--wcp-space-8: 40px;
+	--wcp-space-9: 48px;
+	--wcp-space-10: 56px;
+	--wcp-space-11: 64px;
+	--wcp-space-12: 80px;
+
+	/* Typography — px so a theme's root font-size cannot rescale the shell. */
+	--wcp-font: -apple-system, BlinkMacSystemFont, "Segoe UI", Inter, Roboto,
+		"Helvetica Neue", Arial, "Noto Sans", sans-serif;
+	--wcp-font-mono: ui-monospace, "SF Mono", SFMono-Regular, Menlo, Consolas, monospace;
+	--wcp-text-2xs: 11px;
+	--wcp-text-xs: 12px;
+	--wcp-text-sm: 13px;
+	--wcp-text-base: 14px;
+	--wcp-text-md: 15px;
+	--wcp-text-lg: 17px;
+	--wcp-text-xl: 20px;
+	--wcp-text-2xl: 26px;
+	--wcp-text-3xl: 34px;
+	--wcp-text-4xl: 44px;
+
+	/* Motion */
+	--wcp-ease: cubic-bezier(0.32, 0.72, 0, 1);
+	--wcp-ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+	--wcp-ease-in-out: cubic-bezier(0.65, 0, 0.35, 1);
+	--wcp-duration-fast: 160ms;
+	--wcp-duration-normal: 240ms;
+	--wcp-duration-slow: 420ms;
+	--wcp-duration-button: 200ms;
+	--wcp-transition-fast: var(--wcp-duration-fast) var(--wcp-ease);
+	--wcp-transition-normal: var(--wcp-duration-normal) var(--wcp-ease);
+	--wcp-transition-button: var(--wcp-duration-button) var(--wcp-ease);
+	--wcp-stagger-step: 40ms;
+
+	/* Depth */
+	--wcp-perspective: 1100px;
+	--wcp-tilt-max: 5deg;
+	--wcp-lift: -3px;
+
+	/* Layout */
+	--wcp-sidebar-width: 272px;
+	--wcp-content-max: 1120px;
+	--wcp-sticky-offset: 0px;
+	--wcp-gate-max: 1200px;
+	/* Monogram tint: the preset owns the base hue, the customer owns a
+	   small shift on top of it (printed inline by the template). */
+	--wcp-avatar-base: 246;
+	--wcp-avatar-shift: 0;
+	--wcp-avatar-hue: calc(var(--wcp-avatar-base) + var(--wcp-avatar-shift));
+
+	/* Set by script when the portal runs full-bleed; 0 is the no-JS fallback. */
+	--wcp-bleed-left: 0px;
+	--wcp-bleed-right: 0px;
+
+	/* Measured theme whitespace above and below the portal, and the height of
+	   the site chrome it sits under. 0 keeps the theme's own spacing. */
+	--wcp-pull-top: 0px;
+	--wcp-pull-bottom: 0px;
+	--wcp-chrome-top: 0px;
+
+	/* Breathing room deliberately kept between site header and portal. */
+	--wcp-chrome-gap: 0px;
+}
+
+/* ==========================================================================
+   2. Scoped reset
+   ========================================================================== */
+
+.wcp-portal {
+	position: relative;
+	isolation: isolate;
+	margin: 0;
+	background: var(--wcp-bg);
+	border: 1px solid var(--wcp-border);
+	border-radius: var(--wcp-radius-xl);
+	box-shadow: var(--wcp-shadow-sm);
+	color: var(--wcp-text);
+	font-family: var(--wcp-font);
+	font-size: var(--wcp-text-base);
+	line-height: 1.55;
+	text-align: left;
+	-webkit-font-smoothing: antialiased;
+	-moz-osx-font-smoothing: grayscale;
+	font-feature-settings: "cv11", "ss01", "kern";
+}
+
+.wcp-portal *,
+.wcp-portal *::before,
+.wcp-portal *::after {
+	box-sizing: border-box;
+}
+
+.wcp-portal h1,
+.wcp-portal h2,
+.wcp-portal h3,
+.wcp-portal h4,
+.wcp-portal p,
+.wcp-portal dl,
+.wcp-portal dd,
+.wcp-portal dt,
+.wcp-portal figure,
+.wcp-portal address {
+	margin: 0;
+	padding: 0;
+}
+
+/*
+ * Headings get typography as well as spacing, because themes restyle them
+ * heavily. That makes this `(0,1,1)` rule out-rank a bare component class, so
+ * a heading component that sets `font-weight`, `letter-spacing` or `color`
+ * must be written `.wcp-portal .wcp-thing` -- otherwise it silently renders at
+ * the values below. See the scoping section of DESIGN_SYSTEM.md.
+ */
+.wcp-portal h1,
+.wcp-portal h2,
+.wcp-portal h3,
+.wcp-portal h4 {
+	font-family: inherit;
+	font-weight: 600;
+	color: var(--wcp-text-strong);
+	letter-spacing: -0.012em;
+	text-transform: none;
+}
+
+.wcp-portal ul,
+.wcp-portal ol {
+	margin: 0;
+	padding: 0;
+	list-style: none;
+}
+
+.wcp-portal address {
+	font-style: normal;
+}
+
+/* WooCommerce price markup: <del> for the original, <ins> for the new. */
+.wcp-portal ins {
+	text-decoration: none;
+}
+
+/*
+ * Neutralises theme link styling inside the portal. This has to out-rank rules
+ * like `.entry-content a`, so it is intentionally `(0,1,1)` -- which means it
+ * also out-ranks a bare component class. Any portal component that is rendered
+ * as an <a> and sets `color`, `text-decoration` or `box-shadow` must therefore
+ * be written as `.wcp-portal .wcp-thing`, not `.wcp-thing`.
+ */
+.wcp-portal a {
+	color: inherit;
+	text-decoration: none;
+	box-shadow: none;
+}
+
+.wcp-portal button {
+	margin: 0;
+	padding: 0;
+	border: 0;
+	background: none;
+	color: inherit;
+	font: inherit;
+	line-height: inherit;
+	text-transform: none;
+	cursor: pointer;
+	-webkit-appearance: none;
+	appearance: none;
+}
+
+/*
+ * Form controls. Themes style inputs heavily, so these need the same treatment
+ * links and buttons already had -- and the same `(0,1,1)` specificity, to beat
+ * theme rules such as `.entry-content input`. Component classes that restyle a
+ * control must therefore be written as `.wcp-portal .wcp-input`.
+ */
+.wcp-portal input,
+.wcp-portal select,
+.wcp-portal textarea {
+	margin: 0;
+	padding: 0;
+	border: 0;
+	background: none;
+	color: inherit;
+	font: inherit;
+	line-height: inherit;
+	letter-spacing: inherit;
+	border-radius: 0;
+	-webkit-appearance: none;
+	appearance: none;
+}
+
+.wcp-portal svg {
+	display: block;
+	flex: none;
+}
+
+.wcp-portal :focus-visible {
+	outline: 2px solid var(--wcp-primary);
+	outline-offset: 2px;
+}
+
+/* Legacy fallback for browsers without :focus-visible. */
+.wcp-portal :focus:not(:focus-visible) {
+	outline: none;
+}
+
+/* Set on <html> while the mobile drawer is open. Intentionally unscoped —
+   it is the one rule that must apply outside the portal container. */
+.wcp-scroll-lock,
+.wcp-scroll-lock body {
+	overflow: hidden;
+}
+
+/* ==========================================================================
+   3. Accessibility utilities
+   ========================================================================== */
+
+.wcp-portal .wcp-sr-only {
+	position: absolute !important;
+	width: 1px;
+	height: 1px;
+	padding: 0;
+	margin: -1px;
+	overflow: hidden;
+	clip: rect(0, 0, 0, 0);
+	clip-path: inset(50%);
+	white-space: nowrap;
+	border: 0;
+}
+
+.wcp-portal .wcp-skip-link {
+	position: absolute;
+	top: var(--wcp-space-3);
+	left: var(--wcp-space-3);
+	z-index: 60;
+	padding: 10px 16px;
+	background: var(--wcp-surface);
+	border: 1px solid var(--wcp-border-strong);
+	border-radius: var(--wcp-radius-sm);
+	box-shadow: var(--wcp-shadow-lg);
+	color: var(--wcp-text-strong);
+	font-size: var(--wcp-text-sm);
+	font-weight: 600;
+	white-space: nowrap;
+	opacity: 0;
+	clip-path: inset(50%);
+	pointer-events: none;
+	transform: translateY(-8px);
+	transition: transform var(--wcp-transition-normal), opacity var(--wcp-transition-fast);
+}
+
+.wcp-skip-link:focus {
+	opacity: 1;
+	clip-path: none;
+	pointer-events: auto;
+	transform: translateY(0);
+}
+
+/* ==========================================================================
+   4. Motion system
+   ========================================================================== */
+
+/*
+ * Entrances animate the individual `translate` property rather than
+ * `transform`, so a component is free to use `transform` for hover lift and
+ * 3D tilt without the fill-mode of its entrance overriding it.
+ */
+@keyframes wcp-rise {
+	from {
+		opacity: 0;
+		translate: 0 14px;
+	}
+	to {
+		opacity: 1;
+		translate: 0 0;
+	}
+}
+
+@keyframes wcp-section-in {
+	from {
+		opacity: 0;
+		translate: 0 12px;
+	}
+	to {
+		opacity: 1;
+		translate: 0 0;
+	}
+}
+
+@keyframes wcp-pop {
+	from {
+		opacity: 0;
+		scale: 0.96;
+	}
+	to {
+		opacity: 1;
+		scale: 1;
+	}
+}
+
+@keyframes wcp-drift {
+	0%,
+	100% {
+		translate: 0 0;
+	}
+	50% {
+		translate: 3% -2.5%;
+	}
+}
+
+@keyframes wcp-ambient {
+	0%,
+	100% {
+		background-position: 0% 50%;
+	}
+	50% {
+		background-position: 100% 50%;
+	}
+}
+
+@keyframes wcp-spin {
+	to {
+		rotate: 360deg;
+	}
+}
+
+@keyframes wcp-shimmer {
+	from {
+		translate: -100% 0;
+	}
+	to {
+		translate: 100% 0;
+	}
+}
+
+@keyframes wcp-check-pop {
+	0% {
+		opacity: 0;
+		scale: 0.5;
+	}
+	60% {
+		opacity: 1;
+		scale: 1.12;
+	}
+	100% {
+		opacity: 1;
+		scale: 1;
+	}
+}
+
+@keyframes wcp-menu-in {
+	from {
+		opacity: 0;
+		translate: 0 -6px;
+		scale: 0.98;
+	}
+	to {
+		opacity: 1;
+		translate: 0 0;
+		scale: 1;
+	}
+}
+
+@keyframes wcp-float {
+	0%,
+	100% {
+		translate: 0 0;
+	}
+	50% {
+		translate: 0 -8px;
+	}
+}
+
+@keyframes wcp-pulse-dot {
+	0%,
+	100% {
+		box-shadow: 0 0 0 0 rgba(var(--wcp-primary-rgb), 0.45);
+	}
+	70% {
+		box-shadow: 0 0 0 7px rgba(var(--wcp-primary-rgb), 0);
+	}
+}
+
+/* Reusable stagger: `--wcp-stagger` is an integer set inline by the template.
+   Item 1 = 0ms, item 2 = 40ms, item 3 = 80ms … */
+.wcp-animate {
+	animation: wcp-rise var(--wcp-duration-slow) var(--wcp-ease-out) both;
+	animation-delay: calc(var(--wcp-stagger, 0) * var(--wcp-stagger-step));
+}
+
+/* --- Section transition ------------------------------------------------- */
+
+.wcp-main__inner {
+	transition: opacity 180ms var(--wcp-ease), translate 180ms var(--wcp-ease);
+}
+
+.wcp-main__inner.is-leaving {
+	opacity: 0;
+	translate: 0 -8px;
+	pointer-events: none;
+}
+
+.wcp-main__inner.is-entering {
+	animation: wcp-section-in 300ms var(--wcp-ease-out) both;
+}
+
+/* Entrance animations inside a swapped-in section still stagger; the column
+   itself already slid, so items keep their own rise. */
+
+/* Motion switched off by the administrator: everything is simply present. */
+.wcp-portal[data-wcp-motion="off"] .wcp-animate,
+.wcp-portal[data-wcp-motion="off"] .wcp-main__inner.is-entering {
+	animation: none;
+	opacity: 1;
+	translate: 0 0;
+}
+
+.wcp-portal[data-wcp-motion="off"] .wcp-canvas__glow,
+.wcp-portal[data-wcp-motion="off"] .wcp-canvas__wash,
+.wcp-portal[data-wcp-motion="off"] .wcp-authcard__orbit,
+.wcp-portal[data-wcp-motion="off"] .wcp-identity__ring,
+.wcp-portal[data-wcp-motion="off"] .wcp-hero__eyebrow-dot {
+	animation: none !important;
+}
+
+.wcp-portal[data-wcp-motion="off"] .wcp-footer[data-wcp-reveal-ready] {
+	opacity: 1;
+	translate: 0 0;
+}
+
+.wcp-portal[data-wcp-motion="off"] .wcp-progress__fill {
+	animation: none;
+	transform: none;
+}
+
+/* ==========================================================================
+   5. Depth system
+   ========================================================================== */
+
+/*
+ * Card physics. A surface is built from layers, all of them cheap:
+ *   base surface → hairline border → directional shadow → inner top highlight
+ *   → (interactive only) a soft accent glow on hover.
+ * Hover moves the card on `transform` and deepens the shadow; nothing changes
+ * size, so nothing around it reflows.
+ */
+.wcp-panel {
+	position: relative;
+	display: flex;
+	flex-direction: column;
+	background: var(--wcp-surface);
+	border: 1px solid var(--wcp-border);
+	border-radius: var(--wcp-radius);
+	box-shadow: var(--wcp-shadow-sm), var(--wcp-inset-highlight);
+}
+
+.wcp-panel--elevated {
+	box-shadow: var(--wcp-shadow-md), var(--wcp-inset-highlight);
+}
+
+/*
+ * Card tiers. Not every panel on a screen should read as equally important,
+ * so a page is composed from three weights rather than one repeated surface:
+ *
+ *   .wcp-panel            secondary — a plain surface, the default
+ *   .wcp-panel--feature   primary   — the column's main story, deeper shadow
+ *                                     and a faint accent wash off the top edge
+ *   .wcp-panel--accent    accent    — a small card that wants to be noticed,
+ *                                     tinted and ringed in the accent colour
+ */
+.wcp-panel--feature {
+	overflow: hidden;
+	border-radius: var(--wcp-radius-xl);
+	background:
+		radial-gradient(120% 100% at 0% 0%, rgba(var(--wcp-primary-rgb), 0.05), transparent 58%),
+		linear-gradient(180deg, var(--wcp-surface) 0%, var(--wcp-surface-tint) 100%);
+	box-shadow: var(--wcp-shadow-lg), var(--wcp-inset-highlight);
+}
+
+.wcp-panel--accent {
+	border-color: rgba(var(--wcp-primary-rgb), 0.24);
+	background:
+		linear-gradient(180deg, rgba(var(--wcp-primary-rgb), 0.07), rgba(var(--wcp-primary-rgb), 0.02) 58%),
+		var(--wcp-surface);
+	box-shadow: var(--wcp-shadow-md), 0 0 0 1px rgba(var(--wcp-primary-rgb), 0.06), var(--wcp-inset-highlight);
+}
+
+.wcp-panel--accent .wcp-panel__head {
+	border-bottom-color: rgba(var(--wcp-primary-rgb), 0.14);
+}
+
+/*
+ * 3D-capable cards. The stage is the element that tilts; children marked
+ * `.wcp-depth-N` sit forward of it on the Z axis. Everything is gated three
+ * ways: a fine pointer that can hover, no reduced-motion preference, and the
+ * administrator's switch. Touch devices never see any of this.
+ */
+.wcp-card-3d {
+	position: relative;
+	/* No `overflow: hidden` here: it would flatten `preserve-3d`. The
+	   spotlight clips itself with `border-radius: inherit` instead. */
+}
+
+.wcp-card-3d__spot,
+.wcp-hero__spot,
+.wcp-authcard__spot,
+.wcp-profile-head__spot,
+.wcp-order__summary-spot,
+.wcp-action__spot,
+.wcp-product__spot {
+	position: absolute;
+	inset: 0;
+	z-index: 0;
+	border-radius: inherit;
+	background: radial-gradient(
+		380px circle at var(--wcp-spot-x, 50%) var(--wcp-spot-y, 0%),
+		rgba(var(--wcp-primary-rgb), 0.13),
+		rgba(var(--wcp-primary-rgb), 0) 62%
+	);
+	opacity: 0;
+	pointer-events: none;
+	transition: opacity 320ms var(--wcp-ease);
+}
+
+[data-spotlight-active] > .wcp-card-3d__spot,
+[data-spotlight-active] > .wcp-hero__spot,
+[data-spotlight-active] > .wcp-authcard__spot,
+[data-spotlight-active] > .wcp-profile-head__spot,
+[data-spotlight-active] > .wcp-order__summary-spot,
+[data-spotlight-active] > .wcp-action__spot,
+[data-spotlight-active] > .wcp-product__spot {
+	opacity: 1;
+}
+
+/* Desktop only: a fine pointer that can hover, and a viewport above the
+   drawer breakpoint. Touch and phone layouts stay perfectly still. */
+@media (hover: hover) and (pointer: fine) and (min-width: 1025px) {
+	.wcp-portal[data-wcp-3d="on"] [data-wcp-tilt] {
+		transform: perspective(var(--wcp-perspective)) rotateX(var(--wcp-tilt-x, 0deg)) rotateY(var(--wcp-tilt-y, 0deg));
+		transform-style: preserve-3d;
+		transition: transform 260ms var(--wcp-ease), box-shadow 260ms var(--wcp-ease);
+		will-change: transform;
+	}
+
+	.wcp-portal[data-wcp-3d="on"] [data-wcp-tilt].is-tilting {
+		transition: transform 80ms linear, box-shadow 260ms var(--wcp-ease);
+	}
+
+	.wcp-portal[data-wcp-3d="on"] [data-wcp-tilt] .wcp-depth-1 {
+		transform: translateZ(8px);
+	}
+
+	.wcp-portal[data-wcp-3d="on"] [data-wcp-tilt] .wcp-depth-2 {
+		transform: translateZ(14px);
+	}
+
+	.wcp-portal[data-wcp-3d="on"] [data-wcp-tilt] .wcp-depth-3 {
+		transform: translateZ(20px);
+	}
+
+	.wcp-portal[data-wcp-3d="on"] .wcp-card-3d.is-tilting {
+		box-shadow: var(--wcp-shadow-3d), var(--wcp-inset-highlight);
+	}
+}
+
+/* ==========================================================================
+   6. Shell layout
+   ========================================================================== */
+
+.wcp-portal__frame {
+	display: grid;
+	grid-template-columns: var(--wcp-sidebar-width) minmax(0, 1fr);
+	min-height: 620px;
+}
+
+.wcp-portal__body {
+	position: relative;
+	display: flex;
+	flex-direction: column;
+	min-width: 0;
+	isolation: isolate;
+}
+
+.wcp-header-sentinel {
+	display: block;
+	height: 1px;
+	margin-bottom: -1px;
+}
+
+.wcp-main {
+	position: relative;
+	z-index: 1;
+	flex: 1;
+	/* `flex: 1` is what settles the footer at the bottom of a short page:
+	   the content column absorbs the slack, the footer follows it. The
+	   bottom padding is the gap before the footer, nothing more -- the
+	   closing space itself belongs to the footer now. */
+	padding: var(--wcp-space-7) var(--wcp-space-8) var(--wcp-space-9);
+	outline: none;
+}
+
+.wcp-main__inner {
+	display: flex;
+	flex-direction: column;
+	gap: var(--wcp-space-7);
+	max-width: var(--wcp-content-max);
+	margin: 0 auto;
+	container-type: inline-size;
+	container-name: wcp-content;
+}
+
+.wcp-scrim {
+	position: fixed;
+	inset: 0;
+	z-index: 40;
+	background: rgba(8, 10, 22, 0.5);
+	opacity: 0;
+	visibility: hidden;
+	pointer-events: none;
+	transition: opacity var(--wcp-transition-normal), visibility 0s linear var(--wcp-duration-normal);
+	-webkit-backdrop-filter: blur(3px);
+	backdrop-filter: blur(3px);
+}
+
+/* ==========================================================================
+   7. Sidebar
+   ========================================================================== */
+
+.wcp-sidebar {
+	position: relative;
+	z-index: 45;
+	min-width: 0;
+	background: linear-gradient(180deg, var(--wcp-surface) 0%, var(--wcp-bg-elevated) 100%);
+	border-right: 1px solid var(--wcp-border);
+	border-radius: var(--wcp-radius-xl) 0 0 var(--wcp-radius-xl);
+}
+
+/* A soft accent wash at the head of the sidebar: the brand sits in light
+   rather than on a flat panel. Purely decorative and behind every child. */
+.wcp-sidebar::before {
+	content: "";
+	position: absolute;
+	top: 0;
+	left: 0;
+	right: 0;
+	height: 240px;
+	border-radius: inherit;
+	background: radial-gradient(120% 80% at 18% 0%, rgba(var(--wcp-primary-rgb), 0.09), transparent 72%);
+	pointer-events: none;
+}
+
+/* A hairline of light along the sidebar's inner edge gives it a lip against
+   the content column without a heavy divider. */
+.wcp-sidebar::after {
+	content: "";
+	position: absolute;
+	top: 0;
+	right: -1px;
+	bottom: 0;
+	width: 1px;
+	background: linear-gradient(180deg, transparent, rgba(var(--wcp-primary-rgb), 0.18) 30%, rgba(var(--wcp-primary-rgb), 0.18) 70%, transparent);
+	pointer-events: none;
+}
+
+.wcp-sidebar__inner {
+	position: sticky;
+	top: var(--wcp-sticky-offset);
+	display: flex;
+	flex-direction: column;
+	gap: var(--wcp-space-5);
+	max-height: calc(100vh - var(--wcp-sticky-offset));
+	padding: var(--wcp-space-5) var(--wcp-space-4);
+	overflow-y: auto;
+	overscroll-behavior: contain;
+}
+
+/* --- Brand -------------------------------------------------------------- */
+
+.wcp-brand {
+	display: flex;
+	align-items: center;
+	gap: var(--wcp-space-3);
+	min-width: 0;
+	padding: var(--wcp-space-2) var(--wcp-space-2) var(--wcp-space-4);
+	border-bottom: 1px solid var(--wcp-border);
+}
+
+.wcp-brand__mark {
+	position: relative;
+	display: grid;
+	place-items: center;
+	flex: none;
+	width: 42px;
+	height: 42px;
+	border-radius: 13px;
+	background: linear-gradient(145deg, var(--wcp-primary-hover) 0%, var(--wcp-primary) 55%, rgba(var(--wcp-accent-2-rgb), 1) 140%);
+	color: var(--wcp-primary-contrast);
+	box-shadow: 0 8px 18px -8px rgba(var(--wcp-primary-rgb), 0.7), inset 0 1px 0 rgba(255, 255, 255, 0.35);
+	transition: transform var(--wcp-transition-normal), box-shadow var(--wcp-transition-normal);
+}
+
+.wcp-brand__mark-glow {
+	position: absolute;
+	inset: -6px;
+	z-index: -1;
+	border-radius: inherit;
+	background: radial-gradient(circle, rgba(var(--wcp-primary-rgb), 0.35), transparent 70%);
+	opacity: 0.8;
+	filter: blur(6px);
+}
+
+.wcp-brand:hover .wcp-brand__mark {
+	transform: translateY(-1px) rotate(-3deg);
+	box-shadow: 0 12px 24px -10px rgba(var(--wcp-primary-rgb), 0.8), inset 0 1px 0 rgba(255, 255, 255, 0.35);
+}
+
+.wcp-brand__text {
+	display: flex;
+	flex-direction: column;
+	gap: 1px;
+	min-width: 0;
+}
+
+.wcp-brand__name {
+	overflow: hidden;
+	color: var(--wcp-text-strong);
+	font-size: var(--wcp-text-md);
+	font-weight: 700;
+	letter-spacing: -0.015em;
+	line-height: 1.25;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+}
+
+.wcp-brand__eyebrow {
+	overflow: hidden;
+	color: var(--wcp-muted-soft);
+	font-size: 10px;
+	font-weight: 700;
+	letter-spacing: 0.1em;
+	line-height: 1.2;
+	text-overflow: ellipsis;
+	text-transform: uppercase;
+	white-space: nowrap;
+}
+
+.wcp-portal .wcp-brand > .wcp-sidebar__close {
+	display: none;
+	margin-left: auto;
+}
+
+/* --- Navigation --------------------------------------------------------- */
+
+.wcp-nav {
+	position: relative;
+	--wcp-indicator-y: 0px;
+	--wcp-indicator-height: 0px;
+}
+
+/* Prefixed: the heading is a <p>, and the reset would drop its indent. */
+.wcp-portal .wcp-nav__heading {
+	padding: 0 var(--wcp-space-3);
+	margin-bottom: var(--wcp-space-2);
+	color: var(--wcp-muted-soft);
+	font-size: var(--wcp-text-2xs);
+	font-weight: 700;
+	letter-spacing: 0.12em;
+	text-transform: uppercase;
+}
+
+/*
+ * The active pill is a single element that slides between items. It is a
+ * luminous surface: accent-tinted fill, a hairline, and a soft glow beneath.
+ */
+.wcp-nav__indicator {
+	position: absolute;
+	top: 0;
+	left: 0;
+	right: 0;
+	z-index: 0;
+	height: var(--wcp-indicator-height);
+	border-radius: var(--wcp-radius-md);
+	background: linear-gradient(135deg, rgba(var(--wcp-primary-rgb), 0.16), rgba(var(--wcp-primary-rgb), 0.08));
+	box-shadow: inset 0 0 0 1px rgba(var(--wcp-primary-rgb), 0.18), 0 8px 20px -12px rgba(var(--wcp-primary-rgb), 0.55);
+	opacity: 0;
+	transform: translate3d(0, var(--wcp-indicator-y), 0);
+	transition: transform 360ms var(--wcp-ease), height 360ms var(--wcp-ease), opacity var(--wcp-transition-fast);
+	pointer-events: none;
+}
+
+.wcp-nav__indicator::before {
+	content: "";
+	position: absolute;
+	top: 22%;
+	bottom: 22%;
+	left: -4px;
+	width: 3px;
+	border-radius: var(--wcp-radius-full);
+	background: var(--wcp-primary);
+	box-shadow: 0 0 12px 1px rgba(var(--wcp-primary-rgb), 0.55);
+}
+
+.wcp-nav[data-indicator-ready] .wcp-nav__indicator {
+	opacity: 1;
+}
+
+.wcp-nav__list {
+	display: flex;
+	flex-direction: column;
+	gap: 3px;
+}
+
+.wcp-nav__item {
+	position: relative;
+	z-index: 1;
+}
+
+.wcp-portal .wcp-nav__link {
+	position: relative;
+	display: flex;
+	align-items: center;
+	gap: var(--wcp-space-3);
+	padding: 10px var(--wcp-space-3);
+	border-radius: var(--wcp-radius-md);
+	color: var(--wcp-muted);
+	font-size: var(--wcp-text-base);
+	font-weight: 500;
+	line-height: 1.3;
+	transition: color var(--wcp-transition-fast), background-color var(--wcp-transition-fast), transform var(--wcp-transition-fast);
+}
+
+.wcp-nav__icon {
+	display: grid;
+	place-items: center;
+	flex: none;
+	width: 32px;
+	height: 32px;
+	border-radius: 10px;
+	background: var(--wcp-bg-subtle);
+	color: var(--wcp-muted);
+	transition: transform var(--wcp-transition-normal), background-color var(--wcp-transition-fast), color var(--wcp-transition-fast), box-shadow var(--wcp-transition-fast);
+}
+
+.wcp-nav__label {
+	flex: 1;
+	min-width: 0;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+}
+
+.wcp-nav__chevron {
+	color: var(--wcp-muted-soft);
+	opacity: 0;
+	transform: translateX(-4px);
+	transition: opacity var(--wcp-transition-fast), transform var(--wcp-transition-fast);
+}
+
+.wcp-nav__link:hover {
+	color: var(--wcp-text-strong);
+	background: var(--wcp-surface-hover);
+}
+
+.wcp-nav__link:hover .wcp-nav__icon {
+	background: var(--wcp-surface);
+	color: var(--wcp-primary);
+	box-shadow: var(--wcp-shadow-xs);
+	transform: translateY(-1px);
+}
+
+.wcp-nav__link:hover .wcp-nav__chevron {
+	opacity: 1;
+	transform: translateX(0);
+}
+
+.wcp-portal .wcp-nav__link.is-active {
+	color: var(--wcp-primary);
+	font-weight: 600;
+}
+
+/* No-JS fallback: the link paints its own state until script positions the
+   sliding indicator. */
+.wcp-nav:not([data-indicator-ready]) .wcp-nav__link.is-active {
+	background: linear-gradient(135deg, rgba(var(--wcp-primary-rgb), 0.16), rgba(var(--wcp-primary-rgb), 0.08));
+}
+
+.wcp-nav__link.is-active .wcp-nav__icon {
+	background: var(--wcp-primary);
+	color: var(--wcp-primary-contrast);
+	box-shadow: 0 6px 14px -6px rgba(var(--wcp-primary-rgb), 0.7), inset 0 1px 0 rgba(255, 255, 255, 0.28);
+}
+
+.wcp-nav__link.is-active .wcp-nav__chevron {
+	opacity: 0.7;
+	transform: translateX(0);
+	color: var(--wcp-primary);
+}
+
+.wcp-nav__link.is-loading .wcp-nav__icon {
+	animation: wcp-pulse-dot 900ms ease-out infinite;
+}
+
+.wcp-nav__dot {
+	width: 6px;
+	height: 6px;
+	border-radius: var(--wcp-radius-full);
+	background: var(--wcp-primary);
+}
+
+@media (hover: hover) and (pointer: fine) and (min-width: 1025px) {
+	/* Icons translate forward, subtly, rather than the whole rail. */
+	.wcp-portal[data-wcp-3d="on"] .wcp-nav__link:hover .wcp-nav__icon {
+		transform: translateY(-1px) translateZ(6px) scale(1.04);
+	}
+}
+
+/* --- Sidebar footer ----------------------------------------------------- */
+
+.wcp-sidebar__footer {
+	margin-top: auto;
+	padding-top: var(--wcp-space-4);
+	border-top: 1px solid var(--wcp-border);
+}
+
+.wcp-user-card {
+	position: relative;
+	display: flex;
+	flex-direction: column;
+	gap: var(--wcp-space-2);
+	padding: var(--wcp-space-2);
+	border: 1px solid var(--wcp-border);
+	border-radius: var(--wcp-radius-lg);
+	background: linear-gradient(180deg, var(--wcp-surface) 0%, var(--wcp-surface-tint) 100%);
+	box-shadow: var(--wcp-shadow-sm), var(--wcp-inset-highlight);
+	overflow: hidden;
+	transition: border-color var(--wcp-transition-fast), box-shadow var(--wcp-transition-fast);
+}
+
+.wcp-user-card:hover {
+	border-color: rgba(var(--wcp-primary-rgb), 0.26);
+	box-shadow: var(--wcp-shadow-md), var(--wcp-inset-highlight);
+}
+
+.wcp-user-card__glow {
+	position: absolute;
+	top: -40px;
+	right: -40px;
+	width: 120px;
+	height: 120px;
+	border-radius: var(--wcp-radius-full);
+	background: radial-gradient(circle, rgba(var(--wcp-primary-rgb), 0.22), transparent 68%);
+	pointer-events: none;
+}
+
+.wcp-portal .wcp-user {
+	position: relative;
+	display: flex;
+	align-items: center;
+	gap: var(--wcp-space-3);
+	min-width: 0;
+	padding: var(--wcp-space-2);
+	border-radius: var(--wcp-radius-md);
+	color: var(--wcp-text);
+	transition: background-color var(--wcp-transition-fast);
+}
+
+.wcp-user:hover {
+	background: var(--wcp-surface-hover);
+}
+
+.wcp-user__meta {
+	display: flex;
+	flex-direction: column;
+	gap: 1px;
+	min-width: 0;
+}
+
+.wcp-user__name {
+	overflow: hidden;
+	color: var(--wcp-text-strong);
+	font-size: var(--wcp-text-sm);
+	font-weight: 600;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+}
+
+.wcp-user__email {
+	overflow: hidden;
+	color: var(--wcp-muted-soft);
+	font-size: var(--wcp-text-xs);
+	text-overflow: ellipsis;
+	white-space: nowrap;
+}
+
+.wcp-user__chevron {
+	margin-left: auto;
+	color: var(--wcp-muted-soft);
+	transition: transform var(--wcp-transition-fast), color var(--wcp-transition-fast);
+}
+
+.wcp-user:hover .wcp-user__chevron {
+	transform: translateX(2px);
+	color: var(--wcp-primary);
+}
+
+.wcp-portal .wcp-user-card__signout {
+	justify-content: center;
+	color: var(--wcp-muted);
+	font-size: var(--wcp-text-sm);
+}
+
+/* ==========================================================================
+   8. Header + appearance switcher
+   ========================================================================== */
+
+.wcp-header {
+	position: sticky;
+	top: var(--wcp-sticky-offset);
+	z-index: 30;
+	display: flex;
+	align-items: center;
+	min-height: 78px;
+	padding: var(--wcp-space-4) var(--wcp-space-8);
+	background: var(--wcp-surface-blur);
+	border-bottom: 1px solid var(--wcp-border);
+	border-radius: 0 var(--wcp-radius-xl) 0 0;
+	isolation: isolate;
+	-webkit-backdrop-filter: saturate(160%) blur(16px);
+	backdrop-filter: saturate(160%) blur(16px);
+	transition: box-shadow var(--wcp-transition-normal), border-color var(--wcp-transition-normal);
+}
+
+/* Bottom edge glows faintly with the accent so the header reads as part of
+   the app rather than a bar laid on top of it. */
+.wcp-header::after {
+	content: "";
+	position: absolute;
+	right: 0;
+	bottom: -1px;
+	left: 0;
+	height: 1px;
+	background: linear-gradient(90deg, rgba(var(--wcp-primary-rgb), 0.35), transparent 40%);
+	pointer-events: none;
+}
+
+.wcp-header__inner {
+	display: flex;
+	align-items: center;
+	gap: var(--wcp-space-4);
+	width: 100%;
+	max-width: var(--wcp-content-max);
+	margin: 0 auto;
+}
+
+.wcp-header.is-stuck {
+	border-bottom-color: transparent;
+	box-shadow: var(--wcp-shadow-md);
+}
+
+.wcp-portal .wcp-header__inner > .wcp-header__menu {
+	display: none;
+}
+
+.wcp-header__titles {
+	display: flex;
+	flex-direction: column;
+	gap: 1px;
+	min-width: 0;
+}
+
+.wcp-header__crumb {
+	display: flex;
+	align-items: center;
+	gap: 4px;
+	color: var(--wcp-muted-soft);
+	font-size: var(--wcp-text-2xs);
+	font-weight: 600;
+	letter-spacing: 0.08em;
+	text-transform: uppercase;
+	line-height: 1.2;
+}
+
+.wcp-header__crumb-sep {
+	display: grid;
+	opacity: 0.6;
+}
+
+.wcp-portal .wcp-header__title {
+	overflow: hidden;
+	font-size: var(--wcp-text-xl);
+	font-weight: 700;
+	letter-spacing: -0.02em;
+	line-height: 1.2;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+}
+
+.wcp-header__subtitle {
+	overflow: hidden;
+	color: var(--wcp-muted);
+	font-size: var(--wcp-text-sm);
+	text-overflow: ellipsis;
+	white-space: nowrap;
+}
+
+.wcp-header__actions {
+	display: flex;
+	align-items: center;
+	gap: var(--wcp-space-2);
+	margin-left: auto;
+}
+
+/* --- Icon button -------------------------------------------------------- */
+
+.wcp-portal .wcp-icon-button {
+	position: relative;
+	display: inline-grid;
+	place-items: center;
+	width: 40px;
+	height: 40px;
+	border: 1px solid var(--wcp-border);
+	border-radius: 12px;
+	background: var(--wcp-surface);
+	color: var(--wcp-muted);
+	box-shadow: var(--wcp-shadow-xs), var(--wcp-inset-highlight);
+	transition: color var(--wcp-transition-fast), background-color var(--wcp-transition-fast), transform var(--wcp-transition-fast), box-shadow var(--wcp-transition-fast), border-color var(--wcp-transition-fast);
+}
+
+.wcp-icon-button:hover {
+	color: var(--wcp-text-strong);
+	border-color: var(--wcp-border-strong);
+	box-shadow: var(--wcp-shadow-sm), var(--wcp-inset-highlight);
+	transform: translateY(-1px);
+}
+
+.wcp-icon-button:active {
+	transform: translateY(0) scale(0.96);
+}
+
+/* --- Account chip ------------------------------------------------------- */
+
+.wcp-portal .wcp-account-chip {
+	display: inline-flex;
+	align-items: center;
+	gap: var(--wcp-space-2);
+	padding: 4px 10px 4px 4px;
+	border: 1px solid var(--wcp-border);
+	border-radius: var(--wcp-radius-full);
+	background: var(--wcp-surface);
+	color: var(--wcp-text);
+	box-shadow: var(--wcp-shadow-xs), var(--wcp-inset-highlight);
+	transition: border-color var(--wcp-transition-fast), box-shadow var(--wcp-transition-fast), transform var(--wcp-transition-fast);
+}
+
+.wcp-account-chip:hover {
+	border-color: var(--wcp-border-strong);
+	box-shadow: var(--wcp-shadow-sm), var(--wcp-inset-highlight);
+	transform: translateY(-1px);
+}
+
+.wcp-account-chip__meta {
+	display: flex;
+	flex-direction: column;
+	gap: 0;
+	min-width: 0;
+	line-height: 1.15;
+}
+
+.wcp-account-chip__name {
+	max-width: 160px;
+	overflow: hidden;
+	font-size: var(--wcp-text-sm);
+	font-weight: 600;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+}
+
+.wcp-account-chip__hint {
+	color: var(--wcp-muted-soft);
+	font-size: var(--wcp-text-2xs);
+}
+
+.wcp-account-chip__icon {
+	color: var(--wcp-muted-soft);
+	transition: transform var(--wcp-transition-fast);
+}
+
+.wcp-account-chip:hover .wcp-account-chip__icon {
+	transform: translateY(1px);
+}
+
+/* --- Appearance switcher ------------------------------------------------ */
+
+.wcp-appearance {
+	position: relative;
+}
+
+.wcp-appearance__glyph {
+	position: absolute;
+	display: grid;
+	place-items: center;
+	transition: transform var(--wcp-transition-normal), opacity var(--wcp-transition-fast);
+}
+
+.wcp-appearance__glyph--moon {
+	opacity: 0;
+	transform: rotate(-60deg) scale(0.6);
+}
+
+[data-wcp-theme="dark"] .wcp-appearance__glyph--sun {
+	opacity: 0;
+	transform: rotate(60deg) scale(0.6);
+}
+
+[data-wcp-theme="dark"] .wcp-appearance__glyph--moon {
+	opacity: 1;
+	transform: rotate(0) scale(1);
+}
+
+.wcp-appearance__trigger[aria-expanded="true"] {
+	color: var(--wcp-primary);
+	border-color: rgba(var(--wcp-primary-rgb), 0.35);
+	background: var(--wcp-primary-soft);
+}
+
+.wcp-appearance__menu {
+	position: absolute;
+	top: calc(100% + 10px);
+	right: 0;
+	z-index: 50;
+	display: flex;
+	flex-direction: column;
+	gap: var(--wcp-space-4);
+	width: 300px;
+	max-height: min(72vh, 560px);
+	overflow-y: auto;
+	padding: var(--wcp-space-4);
+	background: var(--wcp-surface);
+	border: 1px solid var(--wcp-border);
+	border-radius: var(--wcp-radius-lg);
+	box-shadow: var(--wcp-shadow-xl), var(--wcp-inset-highlight);
+	transform-origin: top right;
+	animation: wcp-menu-in 200ms var(--wcp-ease-out) both;
+}
+
+.wcp-appearance__menu[hidden] {
+	display: none;
+}
+
+.wcp-appearance__group {
+	display: flex;
+	flex-direction: column;
+	gap: var(--wcp-space-2);
+}
+
+.wcp-appearance__label {
+	color: var(--wcp-muted-soft);
+	font-size: var(--wcp-text-2xs);
+	font-weight: 700;
+	letter-spacing: 0.1em;
+	text-transform: uppercase;
+}
+
+.wcp-appearance__modes {
+	display: grid;
+	grid-template-columns: repeat(3, minmax(0, 1fr));
+	gap: 4px;
+	padding: 4px;
+	border-radius: var(--wcp-radius-md);
+	background: var(--wcp-bg-subtle);
+}
+
+.wcp-portal .wcp-appearance__mode {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	gap: 6px;
+	min-height: 36px;
+	padding: 6px 8px;
+	border-radius: 9px;
+	color: var(--wcp-muted);
+	font-size: var(--wcp-text-sm);
+	font-weight: 500;
+	transition: background-color var(--wcp-transition-fast), color var(--wcp-transition-fast), box-shadow var(--wcp-transition-fast);
+}
+
+.wcp-appearance__mode:hover {
+	color: var(--wcp-text-strong);
+}
+
+.wcp-portal .wcp-appearance__mode[aria-checked="true"] {
+	background: var(--wcp-surface);
+	color: var(--wcp-text-strong);
+	font-weight: 600;
+	box-shadow: var(--wcp-shadow-sm), var(--wcp-inset-highlight);
+}
+
+.wcp-appearance__mode-icon {
+	display: grid;
+}
+
+.wcp-appearance__mode[aria-checked="true"] .wcp-appearance__mode-icon {
+	color: var(--wcp-primary);
+}
+
+.wcp-appearance__presets {
+	display: flex;
+	flex-direction: column;
+	gap: 4px;
+}
+
+.wcp-portal .wcp-appearance__preset {
+	display: flex;
+	align-items: center;
+	gap: var(--wcp-space-3);
+	width: 100%;
+	padding: 8px;
+	border: 1px solid transparent;
+	border-radius: var(--wcp-radius-md);
+	text-align: left;
+	transition: background-color var(--wcp-transition-fast), border-color var(--wcp-transition-fast), transform var(--wcp-transition-fast);
+}
+
+.wcp-appearance__preset:hover {
+	background: var(--wcp-surface-hover);
+	transform: translateX(2px);
+}
+
+.wcp-portal .wcp-appearance__preset[aria-checked="true"] {
+	border-color: rgba(var(--wcp-primary-rgb), 0.45);
+	background: var(--wcp-primary-soft);
+	box-shadow: 0 0 0 1px rgba(var(--wcp-primary-rgb), 0.18), 0 8px 20px -12px rgba(var(--wcp-primary-rgb), 0.7);
+}
+
+/* The selected preset's swatch picks up a ring of the accent, so the choice
+   reads at a glance from the miniature as well as from the check. */
+.wcp-appearance__preset[aria-checked="true"] .wcp-swatch {
+	border-color: rgba(var(--wcp-primary-rgb), 0.5);
+	box-shadow: 0 0 0 2px rgba(var(--wcp-primary-rgb), 0.18);
+}
+
+.wcp-appearance__preset-body {
+	display: flex;
+	flex-direction: column;
+	gap: 1px;
+	min-width: 0;
+	flex: 1;
+}
+
+.wcp-appearance__preset-label {
+	color: var(--wcp-text-strong);
+	font-size: var(--wcp-text-sm);
+	font-weight: 600;
+}
+
+.wcp-appearance__preset-text {
+	color: var(--wcp-muted-soft);
+	font-size: var(--wcp-text-xs);
+}
+
+.wcp-appearance__check {
+	display: grid;
+	place-items: center;
+	width: 20px;
+	height: 20px;
+	border-radius: var(--wcp-radius-full);
+	background: var(--wcp-primary);
+	color: var(--wcp-primary-contrast);
+	opacity: 0;
+	scale: 0.6;
+	transition: opacity var(--wcp-transition-fast), scale var(--wcp-transition-fast);
+}
+
+.wcp-appearance__preset[aria-checked="true"] .wcp-appearance__check {
+	opacity: 1;
+	scale: 1;
+}
+
+/* Preset swatches: a miniature of the theme -- ground, card, accent. Painted
+   with fixed values on purpose: a swatch shows what a preset looks like, not
+   what the current preset looks like. */
+.wcp-swatch {
+	position: relative;
+	display: block;
+	flex: none;
+	width: 44px;
+	height: 32px;
+	overflow: hidden;
+	border-radius: 8px;
+	border: 1px solid rgba(0, 0, 0, 0.08);
+	box-shadow: var(--wcp-shadow-xs);
+}
+
+.wcp-swatch__bg {
+	position: absolute;
+	inset: 0;
+}
+
+.wcp-swatch__card {
+	position: absolute;
+	top: 8px;
+	left: 8px;
+	right: 8px;
+	bottom: 6px;
+	border-radius: 4px;
+}
+
+.wcp-swatch__accent {
+	position: absolute;
+	top: 12px;
+	left: 12px;
+	width: 14px;
+	height: 5px;
+	border-radius: 3px;
+}
+
+.wcp-swatch--aurora .wcp-swatch__bg {
+	background: linear-gradient(135deg, #eef0fb, #f7f5ff);
+}
+
+.wcp-swatch--aurora .wcp-swatch__card {
+	background: #ffffff;
+	box-shadow: 0 1px 3px rgba(40, 30, 120, 0.15);
+}
+
+.wcp-swatch--aurora .wcp-swatch__accent {
+	background: linear-gradient(90deg, #5b4ce0, #7c6cf0);
+}
+
+.wcp-swatch--obsidian .wcp-swatch__bg {
+	background: linear-gradient(135deg, #16181d, #23262d);
+}
+
+.wcp-swatch--obsidian .wcp-swatch__card {
+	background: #2b2f37;
+	box-shadow: 0 1px 3px rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.06);
+}
+
+.wcp-swatch--obsidian .wcp-swatch__accent {
+	background: linear-gradient(90deg, #7c86ff, #9aa6ff);
+}
+
+.wcp-swatch--pearl .wcp-swatch__bg {
+	background: linear-gradient(135deg, #f6f3ed, #fbf8f2);
+}
+
+.wcp-swatch--pearl .wcp-swatch__card {
+	background: #fffdf9;
+	box-shadow: 0 1px 3px rgba(80, 60, 20, 0.14);
+}
+
+.wcp-swatch--pearl .wcp-swatch__accent {
+	background: linear-gradient(90deg, #4a5fc1, #6d7fd6);
+}
+
+.wcp-swatch--midnight .wcp-swatch__bg {
+	background: linear-gradient(135deg, #070c1c, #101a3a);
+}
+
+.wcp-swatch--midnight .wcp-swatch__card {
+	background: #16203e;
+	box-shadow: 0 1px 3px rgba(0, 0, 0, 0.55), inset 0 1px 0 rgba(160, 190, 255, 0.08);
+}
+
+.wcp-swatch--midnight .wcp-swatch__accent {
+	background: linear-gradient(90deg, #7b9cff, #62c8ff);
+}
+
+.wcp-swatch--emerald .wcp-swatch__bg {
+	background: linear-gradient(135deg, #08100d, #12241d);
+}
+
+.wcp-swatch--emerald .wcp-swatch__card {
+	background: #17251f;
+	box-shadow: 0 1px 3px rgba(0, 0, 0, 0.55), inset 0 1px 0 rgba(140, 255, 205, 0.07);
+}
+
+.wcp-swatch--emerald .wcp-swatch__accent {
+	background: linear-gradient(90deg, #34d399, #38bdb2);
+}
+
+/* ==========================================================================
+   9. Primitives
+   ========================================================================== */
+
+/* --- Buttons ------------------------------------------------------------ */
+
+/* Prefixed so it out-ranks the `.wcp-portal button` reset. */
+.wcp-portal .wcp-button {
+	position: relative;
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	gap: 8px;
+	min-height: 40px;
+	padding: 9px 16px;
+	border: 1px solid transparent;
+	border-radius: 11px;
+	font-size: var(--wcp-text-sm);
+	font-weight: 600;
+	letter-spacing: -0.005em;
+	line-height: 1.2;
+	white-space: nowrap;
+	cursor: pointer;
+	user-select: none;
+	transition: transform var(--wcp-transition-button), box-shadow var(--wcp-transition-button), background-color var(--wcp-transition-button), border-color var(--wcp-transition-button), color var(--wcp-transition-button);
+}
+
+.wcp-portal .wcp-button--sm {
+	min-height: 34px;
+	padding: 6px 12px;
+	border-radius: 9px;
+	font-size: var(--wcp-text-xs);
+}
+
+.wcp-portal .wcp-button--lg {
+	min-height: 48px;
+	padding: 12px 20px;
+	border-radius: 13px;
+	font-size: var(--wcp-text-md);
+}
+
+.wcp-portal .wcp-button--block {
+	display: flex;
+	width: 100%;
+}
+
+.wcp-portal .wcp-button--primary {
+	background: linear-gradient(180deg, var(--wcp-primary-hover) -40%, var(--wcp-primary) 60%);
+	border-color: rgba(0, 0, 0, 0.08);
+	color: var(--wcp-primary-contrast);
+	box-shadow: 0 1px 2px rgba(var(--wcp-shadow-color), 0.12), 0 8px 18px -8px rgba(var(--wcp-primary-rgb), 0.6), inset 0 1px 0 rgba(255, 255, 255, 0.22);
+}
+
+.wcp-portal .wcp-button--primary:hover {
+	background: linear-gradient(180deg, var(--wcp-primary) -40%, var(--wcp-primary-hover) 60%);
+	color: var(--wcp-primary-contrast);
+	transform: translateY(-1px);
+	box-shadow: 0 2px 4px rgba(var(--wcp-shadow-color), 0.12), 0 14px 26px -10px rgba(var(--wcp-primary-rgb), 0.7), inset 0 1px 0 rgba(255, 255, 255, 0.24);
+}
+
+.wcp-portal .wcp-button--secondary {
+	background: var(--wcp-surface);
+	border-color: var(--wcp-border-strong);
+	color: var(--wcp-text-strong);
+	box-shadow: var(--wcp-shadow-xs), var(--wcp-inset-highlight);
+}
+
+.wcp-portal .wcp-button--secondary:hover {
+	border-color: rgba(var(--wcp-primary-rgb), 0.45);
+	color: var(--wcp-primary);
+	transform: translateY(-1px);
+	box-shadow: var(--wcp-shadow-sm), var(--wcp-inset-highlight);
+}
+
+.wcp-portal .wcp-button--ghost {
+	background: transparent;
+	color: var(--wcp-muted);
+}
+
+.wcp-portal .wcp-button--ghost:hover {
+	background: var(--wcp-surface-hover);
+	color: var(--wcp-text-strong);
+}
+
+.wcp-portal .wcp-button--danger {
+	background: var(--wcp-danger-soft);
+	border-color: transparent;
+	color: var(--wcp-danger);
+}
+
+.wcp-portal .wcp-button--danger:hover {
+	background: var(--wcp-danger);
+	color: #fff;
+}
+
+.wcp-portal .wcp-button:active {
+	transform: translateY(0) scale(0.98);
+	transition-duration: 80ms;
+}
+
+.wcp-portal .wcp-button:focus-visible {
+	outline: none;
+	box-shadow: var(--wcp-ring);
+}
+
+.wcp-portal .wcp-button.is-disabled,
+.wcp-portal .wcp-button:disabled {
+	opacity: 0.55;
+	cursor: not-allowed;
+	pointer-events: none;
+	transform: none;
+}
+
+.wcp-button__arrow {
+	transition: transform var(--wcp-transition-button);
+}
+
+.wcp-button:hover .wcp-button__arrow {
+	transform: translateX(3px);
+}
+
+/* Loading and success states share the label's box, so the button never
+   changes width while it works. */
+.wcp-button__spinner,
+.wcp-button__check {
+	position: absolute;
+	inset: 0;
+	display: grid;
+	place-items: center;
+	opacity: 0;
+	pointer-events: none;
+}
+
+.wcp-button__spinner::before {
+	content: "";
+	width: 16px;
+	height: 16px;
+	border: 2px solid currentColor;
+	border-right-color: transparent;
+	border-radius: var(--wcp-radius-full);
+	animation: wcp-spin 700ms linear infinite;
+}
+
+.wcp-button.is-loading .wcp-button__label,
+.wcp-button.is-loading > span:not(.wcp-button__spinner):not(.wcp-button__check),
+.wcp-button.is-success .wcp-button__label,
+.wcp-button.is-success > span:not(.wcp-button__spinner):not(.wcp-button__check) {
+	opacity: 0;
+}
+
+.wcp-button.is-loading .wcp-button__spinner {
+	opacity: 1;
+}
+
+.wcp-button.is-success .wcp-button__check {
+	opacity: 1;
+	animation: wcp-check-pop 420ms var(--wcp-ease-out) both;
+}
+
+/* --- Text link ---------------------------------------------------------- */
+
+.wcp-portal .wcp-textlink {
+	color: var(--wcp-primary);
+	font-weight: 600;
+	background-image: linear-gradient(currentColor, currentColor);
+	background-repeat: no-repeat;
+	background-size: 0% 1px;
+	background-position: 0 100%;
+	transition: background-size var(--wcp-transition-normal);
+}
+
+.wcp-textlink:hover {
+	background-size: 100% 1px;
+}
+
+/* --- Avatar ------------------------------------------------------------- */
+
+.wcp-avatar {
+	display: inline-grid;
+	place-items: center;
+	flex: none;
+	width: 38px;
+	height: 38px;
+	border-radius: 12px;
+	background:
+		radial-gradient(120% 120% at 20% 0%, rgba(255, 255, 255, 0.35), transparent 50%),
+		linear-gradient(145deg, hsl(var(--wcp-avatar-hue), 72%, 62%) 0%, hsl(calc(var(--wcp-avatar-hue) + 16), 70%, 48%) 100%);
+	color: #fff;
+	font-size: var(--wcp-text-sm);
+	font-weight: 700;
+	letter-spacing: 0.02em;
+	text-transform: uppercase;
+	box-shadow: 0 6px 14px -6px hsla(var(--wcp-avatar-hue), 70%, 45%, 0.7), inset 0 1px 0 rgba(255, 255, 255, 0.3);
+}
+
+.wcp-avatar--sm {
+	width: 30px;
+	height: 30px;
+	border-radius: 9px;
+	font-size: var(--wcp-text-xs);
+}
+
+.wcp-avatar--lg {
+	width: 84px;
+	height: 84px;
+	border-radius: 24px;
+	font-size: var(--wcp-text-2xl);
+	box-shadow: 0 18px 34px -14px hsla(var(--wcp-avatar-hue), 70%, 40%, 0.75), inset 0 1px 0 rgba(255, 255, 255, 0.35);
+}
+
+.wcp-avatar--xl {
+	width: 104px;
+	height: 104px;
+	border-radius: 30px;
+	font-size: var(--wcp-text-3xl);
+	box-shadow: 0 24px 44px -16px hsla(var(--wcp-avatar-hue), 70%, 40%, 0.8), inset 0 1px 0 rgba(255, 255, 255, 0.35), inset 0 -10px 20px rgba(0, 0, 0, 0.08);
+}
+
+/* --- Pills -------------------------------------------------------------- */
+
+.wcp-pill {
+	display: inline-flex;
+	align-items: center;
+	gap: 6px;
+	padding: 4px 10px;
+	border-radius: var(--wcp-radius-full);
+	background: var(--wcp-neutral-soft);
+	color: var(--wcp-neutral);
+	font-size: var(--wcp-text-xs);
+	font-weight: 600;
+	line-height: 1.4;
+}
+
+.wcp-pill--accent {
+	background: var(--wcp-primary-soft);
+	color: var(--wcp-primary);
+}
+
+.wcp-count-badge {
+	display: inline-flex;
+	align-items: center;
+	gap: 6px;
+	padding: 6px 12px;
+	border: 1px solid var(--wcp-border);
+	border-radius: var(--wcp-radius-full);
+	background: var(--wcp-surface);
+	color: var(--wcp-muted);
+	font-size: var(--wcp-text-xs);
+	font-weight: 700;
+	font-variant-numeric: tabular-nums;
+	box-shadow: var(--wcp-shadow-xs), var(--wcp-inset-highlight);
+}
+
+/* --- Order status ------------------------------------------------------- */
+
+.wcp-order-status {
+	--wcp-status: var(--wcp-neutral);
+	--wcp-status-soft: var(--wcp-neutral-soft);
+	display: inline-flex;
+	align-items: center;
+	gap: 6px;
+	max-width: 100%;
+	padding: 4px 10px 4px 6px;
+	border: 1px solid transparent;
+	border-color: color-mix(in srgb, var(--wcp-status) 22%, transparent);
+	border-radius: var(--wcp-radius-full);
+	background: var(--wcp-status-soft);
+	color: var(--wcp-status);
+	font-size: var(--wcp-text-xs);
+	font-weight: 600;
+	line-height: 1.3;
+	white-space: nowrap;
+	animation: wcp-pop var(--wcp-duration-normal) var(--wcp-ease-out) both;
+}
+
+.wcp-order-status__dot {
+	display: grid;
+	place-items: center;
+	flex: none;
+	width: 16px;
+	height: 16px;
+	border-radius: var(--wcp-radius-full);
+	background: var(--wcp-status);
+	color: var(--wcp-status-soft);
+}
+
+.wcp-order-status__label {
+	overflow: hidden;
+	text-overflow: ellipsis;
+}
+
+.wcp-order-status--success {
+	--wcp-status: var(--wcp-success);
+	--wcp-status-soft: var(--wcp-success-soft);
+}
+
+.wcp-order-status--info {
+	--wcp-status: var(--wcp-info);
+	--wcp-status-soft: var(--wcp-info-soft);
+}
+
+.wcp-order-status--warning {
+	--wcp-status: var(--wcp-warning);
+	--wcp-status-soft: var(--wcp-warning-soft);
+}
+
+.wcp-order-status--danger {
+	--wcp-status: var(--wcp-danger);
+	--wcp-status-soft: var(--wcp-danger-soft);
+}
+
+/* ==========================================================================
+   10. Panels, sections, grids
+   ========================================================================== */
+
+.wcp-section {
+	display: flex;
+	flex-direction: column;
+	gap: var(--wcp-space-5);
+}
+
+.wcp-section__head {
+	display: flex;
+	flex-direction: column;
+	gap: 4px;
+}
+
+.wcp-section__head--row {
+	flex-direction: row;
+	align-items: flex-end;
+	justify-content: space-between;
+	gap: var(--wcp-space-4);
+}
+
+.wcp-portal .wcp-section__title {
+	font-size: var(--wcp-text-2xl);
+	font-weight: 700;
+	letter-spacing: -0.024em;
+	line-height: 1.15;
+}
+
+.wcp-section__text {
+	color: var(--wcp-muted);
+	font-size: var(--wcp-text-md);
+}
+
+.wcp-panel__head {
+	display: flex;
+	flex-direction: column;
+	gap: 3px;
+	padding: var(--wcp-space-5) var(--wcp-space-6);
+	border-bottom: 1px solid var(--wcp-border);
+}
+
+.wcp-panel__head--row {
+	flex-direction: row;
+	align-items: center;
+	justify-content: space-between;
+	gap: var(--wcp-space-4);
+}
+
+.wcp-panel__head--icon {
+	flex-direction: row;
+	align-items: center;
+	gap: var(--wcp-space-3);
+}
+
+.wcp-panel__icon {
+	display: grid;
+	place-items: center;
+	flex: none;
+	width: 36px;
+	height: 36px;
+	border-radius: 11px;
+	background: var(--wcp-primary-soft);
+	color: var(--wcp-primary);
+	box-shadow: inset 0 0 0 1px rgba(var(--wcp-primary-rgb), 0.12);
+}
+
+.wcp-portal .wcp-panel__title {
+	font-size: var(--wcp-text-md);
+	font-weight: 700;
+	letter-spacing: -0.012em;
+	line-height: 1.3;
+}
+
+.wcp-portal .wcp-panel__title--lg {
+	font-size: var(--wcp-text-xl);
+	letter-spacing: -0.02em;
+}
+
+.wcp-panel__text {
+	color: var(--wcp-muted);
+	font-size: var(--wcp-text-sm);
+}
+
+.wcp-portal .wcp-panel__link {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	gap: var(--wcp-space-3);
+	margin-top: auto;
+	padding: var(--wcp-space-4) var(--wcp-space-6);
+	border-top: 1px solid var(--wcp-border);
+	border-radius: 0 0 var(--wcp-radius) var(--wcp-radius);
+	color: var(--wcp-primary);
+	font-size: var(--wcp-text-sm);
+	font-weight: 600;
+	transition: background-color var(--wcp-transition-fast);
+}
+
+.wcp-panel__link svg {
+	transition: transform var(--wcp-transition-fast);
+}
+
+.wcp-panel__link:hover {
+	background: var(--wcp-primary-soft);
+}
+
+.wcp-panel__link:hover svg {
+	transform: translateX(3px);
+}
+
+.wcp-panel--centered {
+	align-items: center;
+	text-align: center;
+}
+
+.wcp-grid {
+	display: grid;
+	gap: var(--wcp-space-5);
+}
+
+.wcp-grid--split {
+	grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.wcp-grid--wide {
+	grid-template-columns: minmax(0, 1.7fr) minmax(280px, 1fr);
+	align-items: start;
+}
+
+.wcp-grid--even {
+	grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.wcp-grid--3 {
+	grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+/* Panels keep their own height instead of stretching to the tallest in the
+   row -- used where the two panels hold genuinely different amounts. */
+.wcp-grid--top {
+	align-items: start;
+}
+
+/*
+ * The narrow column beside a main panel: several small cards, stacked. It
+ * stretches to the height of the main panel and its last card takes up the
+ * slack, so the row ends level instead of trailing off.
+ */
+.wcp-rail {
+	display: flex;
+	flex-direction: column;
+	align-self: stretch;
+	gap: var(--wcp-space-5);
+	min-width: 0;
+}
+
+.wcp-rail > :last-child {
+	flex: 1 1 auto;
+}
+
+.wcp-meta-list {
+	display: flex;
+	flex-wrap: wrap;
+	gap: var(--wcp-space-2) var(--wcp-space-5);
+}
+
+.wcp-meta-list__item {
+	display: inline-flex;
+	align-items: center;
+	gap: 7px;
+	color: var(--wcp-muted);
+	font-size: var(--wcp-text-sm);
+}
+
+.wcp-meta-list__item svg {
+	color: var(--wcp-muted-soft);
+}
+
+/* Back link */
+.wcp-portal .wcp-backlink {
+	display: inline-flex;
+	align-items: center;
+	gap: 8px;
+	align-self: flex-start;
+	padding: 7px 14px 7px 10px;
+	border: 1px solid var(--wcp-border);
+	border-radius: var(--wcp-radius-full);
+	background: var(--wcp-surface);
+	color: var(--wcp-muted);
+	font-size: var(--wcp-text-sm);
+	font-weight: 600;
+	box-shadow: var(--wcp-shadow-xs), var(--wcp-inset-highlight);
+	transition: color var(--wcp-transition-fast), border-color var(--wcp-transition-fast), transform var(--wcp-transition-fast), box-shadow var(--wcp-transition-fast);
+}
+
+.wcp-backlink:hover {
+	color: var(--wcp-text-strong);
+	border-color: var(--wcp-border-strong);
+	transform: translateY(-1px);
+	box-shadow: var(--wcp-shadow-sm), var(--wcp-inset-highlight);
+}
+
+.wcp-backlink__arrow {
+	transition: transform var(--wcp-transition-fast);
+}
+
+.wcp-backlink:hover .wcp-backlink__arrow {
+	transform: translateX(-3px);
+}
+
+.wcp-backlink.is-loading {
+	opacity: 0.7;
+}
+
+/* ==========================================================================
+   11. Empty states
+   ========================================================================== */
+
+.wcp-empty {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	gap: var(--wcp-space-3);
+	max-width: 460px;
+	margin: 0 auto;
+	padding: var(--wcp-space-8) var(--wcp-space-5);
+	text-align: center;
+}
+
+.wcp-empty--lg {
+	padding: var(--wcp-space-11) var(--wcp-space-6);
+}
+
+.wcp-empty__art {
+	position: relative;
+	display: grid;
+	place-items: center;
+	width: 88px;
+	height: 88px;
+	margin-bottom: var(--wcp-space-2);
+}
+
+.wcp-empty__ring {
+	position: absolute;
+	inset: 0;
+	border-radius: var(--wcp-radius-full);
+	background: radial-gradient(circle, rgba(var(--wcp-primary-rgb), 0.22), rgba(var(--wcp-primary-rgb), 0) 70%);
+}
+
+.wcp-empty__glyph {
+	position: relative;
+	display: grid;
+	place-items: center;
+	width: 60px;
+	height: 60px;
+	border-radius: 20px;
+	background: linear-gradient(180deg, var(--wcp-surface) 0%, var(--wcp-surface-tint) 100%);
+	border: 1px solid var(--wcp-border);
+	color: var(--wcp-primary);
+	box-shadow: var(--wcp-shadow-md), var(--wcp-inset-highlight);
+}
+
+.wcp-empty__art--muted .wcp-empty__glyph {
+	color: var(--wcp-muted);
+}
+
+.wcp-empty__art--muted .wcp-empty__ring {
+	background: radial-gradient(circle, rgba(var(--wcp-shadow-color), 0.12), transparent 70%);
+}
+
+.wcp-portal .wcp-empty__title {
+	font-size: var(--wcp-text-lg);
+	font-weight: 700;
+	letter-spacing: -0.015em;
+}
+
+.wcp-portal .wcp-empty__title--lg {
+	font-size: var(--wcp-text-2xl);
+	letter-spacing: -0.022em;
+}
+
+.wcp-empty__text {
+	color: var(--wcp-muted);
+	font-size: var(--wcp-text-md);
+	line-height: 1.6;
+}
+
+.wcp-empty__actions {
+	display: flex;
+	flex-wrap: wrap;
+	justify-content: center;
+	gap: var(--wcp-space-3);
+	margin-top: var(--wcp-space-3);
+}
+
+/* ==========================================================================
+   12. Full-bleed layout
+   ========================================================================== */
+
+/* Doubled class only to out-specify the theme's content-width cap on our own
+   element. The theme's rule itself is left completely intact. */
+.wcp-portal.wcp-portal--full {
+	max-width: none;
+	border-left: 0;
+	border-right: 0;
+	border-radius: 0;
+	--wcp-content-max: 1180px;
+}
+
+/* Applied by script only when the theme has NOT already given the portal full
+   width; measured negative margins, never viewport tricks. */
+.wcp-portal.wcp-portal--full[data-wcp-bleed] {
+	width: auto;
+	margin-left: calc(var(--wcp-bleed-left, 0px) * -1);
+	margin-right: calc(var(--wcp-bleed-right, 0px) * -1);
+}
+
+.wcp-portal--full .wcp-sidebar,
+.wcp-portal--full .wcp-header {
+	border-radius: 0;
+}
+
+/* Chromeless framing: script measures the theme's editorial gap above and
+   below and the portal pulls itself up by that amount, on our element only. */
+.wcp-portal.wcp-portal--full[data-wcp-fit] {
+	margin-top: calc(var(--wcp-pull-top, 0px) * -1);
+	margin-bottom: calc(var(--wcp-pull-bottom, 0px) * -1);
+}
+
+.wcp-portal--full[data-wcp-fit] {
+	min-height: calc(100vh - var(--wcp-chrome-top, 0px));
+	min-height: calc(100svh - var(--wcp-chrome-top, 0px));
+}
+
+.wcp-portal--app.wcp-portal--full[data-wcp-fit] > .wcp-portal__frame {
+	min-height: inherit;
+}
+
+.wcp-portal--gate.wcp-portal--full[data-wcp-fit] {
+	display: grid;
+	/* The hero takes the slack and centres inside it; the compact footer
+	   sits on the last row rather than being centred with it. */
+	grid-template-rows: minmax(0, 1fr) auto;
+	align-content: stretch;
+}
+
+.wcp-portal--gate.wcp-portal--full[data-wcp-fit] .wcp-gate {
+	align-content: center;
+}
+
+/* ==========================================================================
+   13. Ambient canvas
+   ========================================================================== */
+
+/*
+ * Background depth in four layers, all CSS, all on composited elements:
+ *   1. the base colour (the portal itself)
+ *   2. a very slow-moving wash of two accent hues
+ *   3. a faint grid, masked to fade away from the top
+ *   4. localised glows around hero areas
+ * plus a whisper of noise so large flat areas never band.
+ */
+.wcp-canvas {
+	position: absolute;
+	inset: 0;
+	z-index: 0;
+	overflow: hidden;
+	border-radius: inherit;
+	pointer-events: none;
+}
+
+.wcp-canvas__wash {
+	position: absolute;
+	inset: -20%;
+	background:
+		radial-gradient(60% 50% at 14% 10%, var(--wcp-wash-a), transparent 60%),
+		radial-gradient(50% 45% at 88% 22%, var(--wcp-wash-b), transparent 60%),
+		radial-gradient(40% 40% at 60% 92%, var(--wcp-wash-c), transparent 62%);
+	background-size: 160% 160%;
+	animation: wcp-ambient 22s var(--wcp-ease-in-out) infinite;
+	opacity: 0.9;
+}
+
+.wcp-canvas__grid {
+	position: absolute;
+	inset: -1px;
+	background-image: linear-gradient(to right, var(--wcp-grid-line) 1px, transparent 1px),
+		linear-gradient(to bottom, var(--wcp-grid-line) 1px, transparent 1px);
+	background-size: 64px 64px;
+	-webkit-mask-image: radial-gradient(ellipse 84% 64% at 50% 0%, #000 18%, transparent 78%);
+	mask-image: radial-gradient(ellipse 84% 64% at 50% 0%, #000 18%, transparent 78%);
+}
+
+.wcp-canvas__noise {
+	position: absolute;
+	inset: 0;
+	opacity: 0.35;
+	background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0.06 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+	background-size: 160px 160px;
+	mix-blend-mode: multiply;
+}
+
+.wcp-canvas__glow {
+	position: absolute;
+	width: min(760px, 62%);
+	aspect-ratio: 1;
+	border-radius: var(--wcp-radius-full);
+}
+
+.wcp-canvas__glow--a {
+	top: -26%;
+	left: 4%;
+	background: radial-gradient(circle at 50% 50%, rgba(var(--wcp-primary-rgb), 0.16), rgba(var(--wcp-primary-rgb), 0) 64%);
+	animation: wcp-drift 32s var(--wcp-ease-in-out) infinite;
+}
+
+.wcp-canvas__glow--b {
+	right: -10%;
+	bottom: -34%;
+	width: min(680px, 54%);
+	background: radial-gradient(circle at 50% 50%, rgba(var(--wcp-accent-2-rgb), 0.12), rgba(var(--wcp-accent-2-rgb), 0) 64%);
+	animation: wcp-drift 42s var(--wcp-ease-in-out) infinite reverse;
+}
+
+.wcp-canvas__glow--c {
+	top: 30%;
+	right: 18%;
+	width: min(420px, 36%);
+	background: radial-gradient(circle at 50% 50%, var(--wcp-wash-c), transparent 64%);
+	animation: wcp-drift 52s var(--wcp-ease-in-out) infinite;
+}
+
+/* Quieter behind the authenticated shell, where content carries the page. */
+.wcp-canvas--app {
+	opacity: 0.8;
+}
+
+.wcp-canvas--app .wcp-canvas__wash {
+	animation: none;
+	opacity: 0.6;
+}
+
+.wcp-portal--gate .wcp-canvas__grid {
+	-webkit-mask-image: radial-gradient(ellipse 98% 80% at 50% 24%, #000 34%, transparent 88%);
+	mask-image: radial-gradient(ellipse 98% 80% at 50% 24%, #000 34%, transparent 88%);
+}
+
+.wcp-portal--gate .wcp-canvas__glow--a {
+	top: -18%;
+	left: 2%;
+	width: min(820px, 64%);
+}
+
+.wcp-portal--gate .wcp-canvas__glow--b {
+	right: -6%;
+	bottom: -18%;
+	width: min(860px, 64%);
+}
+
+/* ==========================================================================
+   14. Logged-out gate
+   ========================================================================== */
+
+.wcp-portal--gate {
+	position: relative;
+	overflow: hidden;
+	container-type: inline-size;
+	container-name: wcp-gate;
+}
+
+.wcp-gate {
+	position: relative;
+	z-index: 1;
+	display: grid;
+	grid-template-columns: minmax(0, 1.08fr) minmax(0, 0.92fr);
+	align-items: center;
+	gap: clamp(36px, 5vw, 80px);
+	max-width: var(--wcp-gate-max);
+	margin: 0 auto;
+	padding: clamp(48px, 7vh, 96px) clamp(20px, 4vw, 56px);
+}
+
+/* --- Introduction column ------------------------------------------------ */
+
+.wcp-gate__intro {
+	display: flex;
+	flex-direction: column;
+	gap: var(--wcp-space-6);
+	min-width: 0;
+}
+
+.wcp-brandmark {
+	display: inline-flex;
+	align-items: center;
+	gap: 10px;
+	align-self: flex-start;
+	padding: 6px 14px 6px 6px;
+	border: 1px solid var(--wcp-border);
+	border-radius: var(--wcp-radius-full);
+	background: var(--wcp-surface-blur);
+	box-shadow: var(--wcp-shadow-sm), var(--wcp-inset-highlight);
+	-webkit-backdrop-filter: blur(10px);
+	backdrop-filter: blur(10px);
+}
+
+.wcp-brandmark__icon {
+	display: grid;
+	place-items: center;
+	width: 30px;
+	height: 30px;
+	border-radius: 10px;
+	background: linear-gradient(145deg, var(--wcp-primary-hover), var(--wcp-primary));
+	color: var(--wcp-primary-contrast);
+	box-shadow: 0 6px 14px -6px rgba(var(--wcp-primary-rgb), 0.7), inset 0 1px 0 rgba(255, 255, 255, 0.3);
+}
+
+.wcp-brandmark__text {
+	display: flex;
+	flex-direction: column;
+	line-height: 1.15;
+}
+
+.wcp-brandmark__name {
+	color: var(--wcp-text-strong);
+	font-size: var(--wcp-text-sm);
+	font-weight: 700;
+	letter-spacing: -0.01em;
+}
+
+.wcp-brandmark__label {
+	color: var(--wcp-muted-soft);
+	font-size: 10px;
+	font-weight: 700;
+	letter-spacing: 0.12em;
+	text-transform: uppercase;
+}
+
+.wcp-portal .wcp-gate__headline {
+	display: flex;
+	flex-direction: column;
+	font-size: clamp(36px, 3.9vw, 54px);
+	font-weight: 800;
+	letter-spacing: -0.035em;
+	line-height: 1.04;
+}
+
+.wcp-gate__headline-line--soft {
+	background: linear-gradient(92deg, var(--wcp-primary) 0%, rgba(var(--wcp-accent-2-rgb), 1) 60%, var(--wcp-primary-hover) 100%);
+	-webkit-background-clip: text;
+	background-clip: text;
+	color: transparent;
+}
+
+.wcp-gate__lead {
+	max-width: 520px;
+	color: var(--wcp-muted);
+	font-size: var(--wcp-text-lg);
+	line-height: 1.6;
+}
+
+/* --- Benefit rows ------------------------------------------------------- */
+
+.wcp-benefits {
+	display: flex;
+	flex-direction: column;
+	gap: var(--wcp-space-2);
+	max-width: 520px;
+}
+
+.wcp-benefit {
+	display: flex;
+	align-items: flex-start;
+	gap: var(--wcp-space-4);
+	padding: var(--wcp-space-3) var(--wcp-space-4);
+	border: 1px solid transparent;
+	border-radius: var(--wcp-radius-lg);
+	transition: background-color var(--wcp-transition-normal), border-color var(--wcp-transition-normal), transform var(--wcp-transition-normal), box-shadow var(--wcp-transition-normal);
+}
+
+.wcp-benefit:hover {
+	background: var(--wcp-surface-blur);
+	border-color: var(--wcp-border);
+	box-shadow: var(--wcp-shadow-md), var(--wcp-inset-highlight);
+	transform: translateX(4px);
+}
+
+.wcp-benefit__icon {
+	display: grid;
+	place-items: center;
+	flex: none;
+	width: 44px;
+	height: 44px;
+	border-radius: 14px;
+	background: linear-gradient(180deg, var(--wcp-surface) 0%, var(--wcp-surface-tint) 100%);
+	border: 1px solid var(--wcp-border);
+	color: var(--wcp-primary);
+	box-shadow: var(--wcp-shadow-sm), var(--wcp-inset-highlight);
+	transition: transform var(--wcp-transition-normal), box-shadow var(--wcp-transition-normal);
+}
+
+.wcp-benefit:hover .wcp-benefit__icon {
+	transform: translateY(-2px) rotate(-4deg);
+	box-shadow: var(--wcp-glow), var(--wcp-inset-highlight);
+}
+
+.wcp-benefit__body {
+	display: flex;
+	flex-direction: column;
+	gap: 2px;
+}
+
+.wcp-benefit__title {
+	color: var(--wcp-text-strong);
+	font-size: var(--wcp-text-md);
+	font-weight: 600;
+	letter-spacing: -0.01em;
+}
+
+.wcp-benefit__text {
+	color: var(--wcp-muted);
+	font-size: var(--wcp-text-sm);
+	line-height: 1.5;
+}
+
+/* --- Authentication card ------------------------------------------------ */
+
+.wcp-authcard__stage {
+	position: relative;
+	transform-style: preserve-3d;
+}
+
+.wcp-authcard {
+	position: relative;
+	overflow: hidden;
+	border: 1px solid var(--wcp-border);
+	border-radius: 28px;
+	background: linear-gradient(180deg, var(--wcp-surface) 0%, var(--wcp-surface-tint) 100%);
+	box-shadow: var(--wcp-shadow-xl), var(--wcp-inset-highlight), 0 0 0 1px rgba(255, 255, 255, 0.4) inset;
+}
+
+.wcp-authcard__spot {
+	z-index: 0;
+}
+
+.wcp-authcard__sheen {
+	position: absolute;
+	inset: 0;
+	z-index: 0;
+	background: linear-gradient(120deg, transparent 30%, rgba(255, 255, 255, 0.35) 48%, transparent 60%);
+	opacity: 0.6;
+	pointer-events: none;
+}
+
+.wcp-authcard__inner {
+	position: relative;
+	z-index: 1;
+	display: flex;
+	flex-direction: column;
+	gap: var(--wcp-space-4);
+	padding: var(--wcp-space-9) var(--wcp-space-8) var(--wcp-space-8);
+}
+
+.wcp-authcard__mark {
+	position: relative;
+	display: grid;
+	place-items: center;
+	width: 60px;
+	height: 60px;
+	margin-bottom: var(--wcp-space-2);
+	border-radius: 20px;
+	background: linear-gradient(145deg, var(--wcp-primary-hover) 0%, var(--wcp-primary) 60%, rgba(var(--wcp-accent-2-rgb), 1) 150%);
+	color: var(--wcp-primary-contrast);
+	box-shadow: 0 16px 30px -12px rgba(var(--wcp-primary-rgb), 0.8), inset 0 1px 0 rgba(255, 255, 255, 0.35);
+}
+
+.wcp-authcard__mark-ring {
+	position: absolute;
+	inset: -7px;
+	border-radius: 26px;
+	border: 1px solid rgba(var(--wcp-primary-rgb), 0.28);
+	background: radial-gradient(circle, rgba(var(--wcp-primary-rgb), 0.16), transparent 70%);
+}
+
+.wcp-portal .wcp-authcard__title {
+	font-size: var(--wcp-text-2xl);
+	font-weight: 700;
+	letter-spacing: -0.024em;
+	line-height: 1.15;
+}
+
+/* Prefixed: the scoped reset zeroes every <p>'s margin at (0,1,1). */
+.wcp-portal .wcp-authcard__text {
+	margin-top: -8px;
+	color: var(--wcp-muted);
+	font-size: var(--wcp-text-md);
+}
+
+.wcp-authcard__alt {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 6px;
+	color: var(--wcp-muted);
+	font-size: var(--wcp-text-sm);
+}
+
+/* Prefixed: the scoped reset zeroes every <p>'s margin and padding. */
+.wcp-portal .wcp-authcard__trust {
+	display: flex;
+	align-items: flex-start;
+	gap: 8px;
+	margin-top: var(--wcp-space-2);
+	padding-top: var(--wcp-space-4);
+	border-top: 1px solid var(--wcp-border);
+	color: var(--wcp-muted-soft);
+	font-size: var(--wcp-text-xs);
+	line-height: 1.5;
+}
+
+.wcp-authcard__trust svg {
+	margin-top: 1px;
+	color: var(--wcp-success);
+}
+
+/* Two floating glyphs orbit the card: they sit forward on Z when the stage
+   tilts, and drift slowly the rest of the time. Decorative, hidden from AT. */
+.wcp-authcard__orbit {
+	position: absolute;
+	z-index: 2;
+	display: grid;
+	place-items: center;
+	border: 1px solid var(--wcp-border);
+	border-radius: 16px;
+	background: var(--wcp-surface);
+	color: var(--wcp-primary);
+	box-shadow: var(--wcp-shadow-lg), var(--wcp-inset-highlight);
+	transform: translateZ(30px);
+	animation: wcp-float 7s var(--wcp-ease-in-out) infinite;
+}
+
+.wcp-authcard__orbit--a {
+	top: -18px;
+	right: 28px;
+	width: 48px;
+	height: 48px;
+}
+
+.wcp-authcard__orbit--b {
+	bottom: 34px;
+	left: -18px;
+	width: 42px;
+	height: 42px;
+	border-radius: 14px;
+	animation-delay: -3s;
+	animation-duration: 8s;
+}
+
+/*
+ * The appearance switcher on the signed-out screen. The choice lives in the
+ * browser, so it has never needed an account -- and a visitor who prefers dark
+ * should be able to say so before signing in.
+ */
+.wcp-gate__controls {
+	position: absolute;
+	top: var(--wcp-space-5);
+	right: var(--wcp-space-6);
+	z-index: 5;
+}
+
+.wcp-portal--gate .wcp-gate__controls .wcp-appearance__menu {
+	max-height: min(76vh, 560px);
+}
+
+/* ==========================================================================
+   15. Orders
+   ========================================================================== */
+
+.wcp-orders {
+	position: relative;
+	overflow: hidden;
+	background: var(--wcp-surface);
+	border: 1px solid var(--wcp-border);
+	border-radius: var(--wcp-radius);
+	box-shadow: var(--wcp-shadow-md), var(--wcp-inset-highlight);
+}
+
+.wcp-orders__head,
+.wcp-order-row {
+	display: grid;
+	grid-template-columns: minmax(150px, 1.1fr) minmax(130px, 0.9fr) minmax(140px, 0.95fr) minmax(0, 1.6fr) minmax(110px, 0.7fr) auto;
+	align-items: center;
+	gap: var(--wcp-space-4);
+}
+
+.wcp-orders__head {
+	position: sticky;
+	top: 0;
+	z-index: 2;
+	padding: 12px var(--wcp-space-6);
+	background: var(--wcp-bg-elevated);
+	border-bottom: 1px solid var(--wcp-border);
+	color: var(--wcp-muted-soft);
+	font-size: var(--wcp-text-2xs);
+	font-weight: 700;
+	letter-spacing: 0.1em;
+	text-transform: uppercase;
+}
+
+.wcp-orders__list {
+	display: flex;
+	flex-direction: column;
+}
+
+.wcp-orders__item + .wcp-orders__item {
+	border-top: 1px solid var(--wcp-border);
+}
+
+.wcp-portal .wcp-order-row {
+	position: relative;
+	padding: var(--wcp-space-4) var(--wcp-space-6);
+	color: var(--wcp-text);
+	transition: background-color var(--wcp-transition-fast), transform var(--wcp-transition-fast), box-shadow var(--wcp-transition-fast);
+}
+
+/* An accent rail slides in on hover so the row reads as selected, not lit. */
+.wcp-order-row::before {
+	content: "";
+	position: absolute;
+	top: 12px;
+	bottom: 12px;
+	left: 0;
+	width: 3px;
+	border-radius: 0 3px 3px 0;
+	background: var(--wcp-primary);
+	opacity: 0;
+	transform: translateX(-3px);
+	transition: opacity var(--wcp-transition-fast), transform var(--wcp-transition-fast);
+}
+
+.wcp-order-row:hover {
+	background: var(--wcp-surface-hover);
+}
+
+.wcp-order-row:hover::before {
+	opacity: 1;
+	transform: translateX(0);
+}
+
+.wcp-order-row:focus-visible {
+	outline: none;
+	box-shadow: inset var(--wcp-ring);
+}
+
+.wcp-order-row__label {
+	display: none;
+	color: var(--wcp-muted-soft);
+	font-size: var(--wcp-text-2xs);
+	font-weight: 700;
+	letter-spacing: 0.08em;
+	text-transform: uppercase;
+}
+
+.wcp-orders__col--order {
+	display: flex;
+	align-items: center;
+	gap: 10px;
+}
+
+.wcp-order-row__glyph {
+	display: grid;
+	place-items: center;
+	flex: none;
+	width: 34px;
+	height: 34px;
+	border-radius: 10px;
+	background: var(--wcp-bg-subtle);
+	color: var(--wcp-muted);
+	transition: transform var(--wcp-transition-fast), background-color var(--wcp-transition-fast), color var(--wcp-transition-fast);
+}
+
+.wcp-order-row:hover .wcp-order-row__glyph {
+	background: var(--wcp-primary-soft);
+	color: var(--wcp-primary);
+	transform: translateY(-1px);
+}
+
+.wcp-order-row__number {
+	color: var(--wcp-text-strong);
+	font-size: var(--wcp-text-md);
+	font-weight: 700;
+	font-variant-numeric: tabular-nums;
+	letter-spacing: -0.01em;
+}
+
+.wcp-order-row__date {
+	color: var(--wcp-muted);
+	font-size: var(--wcp-text-sm);
+	font-variant-numeric: tabular-nums;
+}
+
+.wcp-orders__col--items {
+	display: flex;
+	flex-direction: column;
+	gap: 2px;
+	min-width: 0;
+}
+
+.wcp-order-row__items {
+	color: var(--wcp-text-strong);
+	font-size: var(--wcp-text-sm);
+	font-weight: 600;
+}
+
+.wcp-order-row__teaser {
+	overflow: hidden;
+	color: var(--wcp-muted-soft);
+	font-size: var(--wcp-text-xs);
+	text-overflow: ellipsis;
+	white-space: nowrap;
+}
+
+.wcp-order-row__total {
+	color: var(--wcp-text-strong);
+	font-size: var(--wcp-text-md);
+	font-weight: 700;
+	font-variant-numeric: tabular-nums;
+	letter-spacing: -0.01em;
+}
+
+.wcp-order-row__total del {
+	margin-right: 6px;
+	color: var(--wcp-muted-soft);
+	font-weight: 500;
+	font-size: var(--wcp-text-sm);
+}
+
+.wcp-order-row__cta {
+	display: inline-flex;
+	align-items: center;
+	gap: 6px;
+	padding: 6px 10px 6px 12px;
+	border-radius: var(--wcp-radius-full);
+	background: var(--wcp-primary-soft);
+	color: var(--wcp-primary);
+	font-size: var(--wcp-text-xs);
+	font-weight: 700;
+	white-space: nowrap;
+	opacity: 0;
+	transform: translateX(6px);
+	transition: opacity var(--wcp-transition-fast), transform var(--wcp-transition-fast);
+}
+
+.wcp-order-row:hover .wcp-order-row__cta,
+.wcp-order-row:focus-visible .wcp-order-row__cta {
+	opacity: 1;
+	transform: translateX(0);
+}
+
+.wcp-order-row__arrow {
+	transition: transform var(--wcp-transition-fast);
+}
+
+.wcp-order-row:hover .wcp-order-row__arrow {
+	transform: translateX(3px);
+}
+
+.wcp-order-row.is-loading {
+	opacity: 0.6;
+}
+
+/* --- Skeleton ----------------------------------------------------------- */
+
+.wcp-skeleton[hidden],
+.wcp-skeleton--dash[hidden] {
+	display: none;
+}
+
+.wcp-skeleton__row {
+	display: grid;
+	grid-template-columns: minmax(150px, 1.1fr) minmax(130px, 0.9fr) minmax(140px, 0.95fr) minmax(0, 1.6fr) minmax(110px, 0.7fr) auto;
+	align-items: center;
+	gap: var(--wcp-space-4);
+	padding: var(--wcp-space-5) var(--wcp-space-6);
+	animation: wcp-rise var(--wcp-duration-normal) var(--wcp-ease-out) both;
+	animation-delay: calc(var(--wcp-stagger, 0) * var(--wcp-stagger-step));
+}
+
+.wcp-skeleton__row + .wcp-skeleton__row {
+	border-top: 1px solid var(--wcp-border);
+}
+
+.wcp-skeleton__bar,
+.wcp-skeleton__block {
+	position: relative;
+	display: block;
+	overflow: hidden;
+	height: 14px;
+	border-radius: 7px;
+	background: var(--wcp-bg-subtle);
+}
+
+.wcp-skeleton__bar::after,
+.wcp-skeleton__block::after {
+	content: "";
+	position: absolute;
+	inset: 0;
+	background: linear-gradient(90deg, transparent, var(--wcp-highlight), transparent);
+	opacity: 0.7;
+	animation: wcp-shimmer 1.6s var(--wcp-ease-in-out) infinite;
+}
+
+.wcp-skeleton__bar--order {
+	width: 60%;
+	height: 18px;
+}
+
+.wcp-skeleton__bar--status {
+	width: 90px;
+	height: 24px;
+	border-radius: var(--wcp-radius-full);
+}
+
+.wcp-skeleton__bar--items {
+	width: 80%;
+}
+
+.wcp-skeleton__bar--total {
+	width: 70%;
+	height: 18px;
+}
+
+.wcp-skeleton__bar--action {
+	width: 28px;
+	height: 28px;
+	border-radius: var(--wcp-radius-full);
+}
+
+/* --- Pagination --------------------------------------------------------- */
+
+.wcp-pagination {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	gap: var(--wcp-space-3);
+}
+
+.wcp-pagination__status {
+	color: var(--wcp-muted);
+	font-size: var(--wcp-text-sm);
+	font-variant-numeric: tabular-nums;
+}
+
+/* ==========================================================================
+   16. Order detail
+   ========================================================================== */
+
+.wcp-order {
+	display: flex;
+	flex-direction: column;
+	gap: var(--wcp-space-5);
+}
+
+/* --- Summary ------------------------------------------------------------ */
+
+.wcp-order__summary {
+	position: relative;
+	overflow: hidden;
+	display: flex;
+	flex-direction: column;
+	gap: var(--wcp-space-6);
+	padding: var(--wcp-space-7) var(--wcp-space-8);
+	border: 1px solid var(--wcp-border);
+	border-radius: var(--wcp-radius-xl);
+	background: linear-gradient(180deg, var(--wcp-surface) 0%, var(--wcp-surface-tint) 100%);
+	box-shadow: var(--wcp-shadow-lg), var(--wcp-inset-highlight);
+}
+
+.wcp-order__summary-glow {
+	position: absolute;
+	top: -40%;
+	right: -10%;
+	width: 60%;
+	aspect-ratio: 1;
+	border-radius: var(--wcp-radius-full);
+	background: radial-gradient(circle, rgba(var(--wcp-primary-rgb), 0.16), transparent 66%);
+	pointer-events: none;
+}
+
+.wcp-order__summary-grid,
+.wcp-hero__grid,
+.wcp-profile-head__grid {
+	position: absolute;
+	inset: 0;
+	background-image: linear-gradient(to right, var(--wcp-grid-line) 1px, transparent 1px),
+		linear-gradient(to bottom, var(--wcp-grid-line) 1px, transparent 1px);
+	background-size: 40px 40px;
+	-webkit-mask-image: radial-gradient(ellipse 60% 80% at 100% 0%, #000 10%, transparent 70%);
+	mask-image: radial-gradient(ellipse 60% 80% at 100% 0%, #000 10%, transparent 70%);
+	pointer-events: none;
+}
+
+.wcp-order__heading {
+	position: relative;
+	z-index: 1;
+	display: flex;
+	flex-wrap: wrap;
+	align-items: center;
+	gap: var(--wcp-space-3) var(--wcp-space-4);
+}
+
+.wcp-order__eyebrow {
+	flex-basis: 100%;
+	color: var(--wcp-muted-soft);
+	font-size: var(--wcp-text-2xs);
+	font-weight: 700;
+	letter-spacing: 0.12em;
+	text-transform: uppercase;
+}
+
+.wcp-portal .wcp-order__title {
+	font-size: var(--wcp-text-3xl);
+	font-weight: 800;
+	letter-spacing: -0.03em;
+	line-height: 1.05;
+	font-variant-numeric: tabular-nums;
+}
+
+.wcp-order__facts {
+	position: relative;
+	z-index: 1;
+	display: grid;
+	grid-template-columns: repeat(3, minmax(0, auto));
+	gap: var(--wcp-space-3);
+	justify-content: start;
+}
+
+.wcp-order__fact {
+	display: flex;
+	flex-direction: column;
+	gap: 6px;
+	min-width: 150px;
+	padding: var(--wcp-space-3) var(--wcp-space-4);
+	border: 1px solid var(--wcp-border);
+	border-radius: var(--wcp-radius-md);
+	background: var(--wcp-surface-blur);
+	box-shadow: var(--wcp-inset-highlight);
+}
+
+.wcp-order__fact dt {
+	display: inline-flex;
+	align-items: center;
+	gap: 6px;
+	color: var(--wcp-muted-soft);
+	font-size: var(--wcp-text-2xs);
+	font-weight: 700;
+	letter-spacing: 0.1em;
+	text-transform: uppercase;
+}
+
+.wcp-order__fact dd {
+	color: var(--wcp-text-strong);
+	font-size: var(--wcp-text-md);
+	font-weight: 600;
+	font-variant-numeric: tabular-nums;
+}
+
+.wcp-order__fact--total dd {
+	color: var(--wcp-primary);
+	font-size: var(--wcp-text-xl);
+	font-weight: 800;
+	letter-spacing: -0.02em;
+}
+
+/* --- Timeline ----------------------------------------------------------- */
+
+.wcp-timeline {
+	position: relative;
+	z-index: 1;
+	display: grid;
+	grid-auto-flow: column;
+	grid-auto-columns: 1fr;
+	gap: var(--wcp-space-3);
+	padding-top: var(--wcp-space-2);
+}
+
+.wcp-timeline__step {
+	position: relative;
+	display: flex;
+	flex-direction: column;
+	gap: 10px;
+}
+
+.wcp-timeline__step::before {
+	content: "";
+	position: absolute;
+	top: 11px;
+	right: 0;
+	left: 24px;
+	height: 2px;
+	border-radius: 2px;
+	background: var(--wcp-border-strong);
+}
+
+.wcp-timeline__step:last-child::before {
+	display: none;
+}
+
+.wcp-timeline__step--done::before {
+	background: linear-gradient(90deg, var(--wcp-primary), var(--wcp-primary-hover));
+}
+
+.wcp-timeline__marker {
+	position: relative;
+	z-index: 1;
+	display: grid;
+	place-items: center;
+	width: 24px;
+	height: 24px;
+	border: 2px solid var(--wcp-border-strong);
+	border-radius: var(--wcp-radius-full);
+	background: var(--wcp-surface);
+	color: var(--wcp-primary-contrast);
+}
+
+.wcp-timeline__step--done .wcp-timeline__marker {
+	border-color: var(--wcp-primary);
+	background: var(--wcp-primary);
+	box-shadow: 0 6px 14px -6px rgba(var(--wcp-primary-rgb), 0.7);
+}
+
+.wcp-timeline__step--current .wcp-timeline__marker {
+	border-color: var(--wcp-primary);
+	box-shadow: 0 0 0 4px rgba(var(--wcp-primary-rgb), 0.16);
+	animation: wcp-pulse-dot 2.4s ease-out infinite;
+}
+
+.wcp-timeline__step--current .wcp-timeline__marker::after {
+	content: "";
+	width: 8px;
+	height: 8px;
+	border-radius: var(--wcp-radius-full);
+	background: var(--wcp-primary);
+}
+
+.wcp-timeline__label {
+	color: var(--wcp-muted);
+	font-size: var(--wcp-text-sm);
+	font-weight: 500;
+}
+
+.wcp-timeline__step--done .wcp-timeline__label,
+.wcp-timeline__step--current .wcp-timeline__label {
+	color: var(--wcp-text-strong);
+	font-weight: 600;
+}
+
+/* --- Line items --------------------------------------------------------- */
+
+.wcp-line-items {
+	display: flex;
+	flex-direction: column;
+}
+
+.wcp-line-item {
+	display: grid;
+	grid-template-columns: auto minmax(0, 1fr) auto;
+	align-items: center;
+	gap: var(--wcp-space-4);
+	padding: var(--wcp-space-4) var(--wcp-space-6);
+	transition: background-color var(--wcp-transition-fast);
+}
+
+.wcp-line-item + .wcp-line-item {
+	border-top: 1px solid var(--wcp-border);
+}
+
+.wcp-line-item:hover {
+	background: var(--wcp-surface-hover);
+}
+
+.wcp-line-item__media {
+	position: relative;
+	flex: none;
+	width: 64px;
+	height: 64px;
+}
+
+.wcp-line-item__image {
+	display: block;
+	width: 64px;
+	height: 64px;
+	object-fit: cover;
+	border-radius: 14px;
+	border: 1px solid var(--wcp-border);
+	background: var(--wcp-surface);
+}
+
+/* Product placeholder: never a blank square. A soft tinted tile with a glow
+   and the bag glyph, in the theme's own colours. */
+.wcp-line-item__placeholder {
+	position: relative;
+	display: grid;
+	place-items: center;
+	width: 64px;
+	height: 64px;
+	overflow: hidden;
+	border-radius: 14px;
+	border: 1px solid rgba(var(--wcp-primary-rgb), 0.16);
+	background: linear-gradient(145deg, var(--wcp-primary-soft) 0%, var(--wcp-surface) 100%);
+	color: var(--wcp-primary);
+	box-shadow: var(--wcp-inset-highlight);
+}
+
+.wcp-line-item__placeholder-glow {
+	position: absolute;
+	inset: -30% -30% auto auto;
+	width: 70%;
+	aspect-ratio: 1;
+	border-radius: var(--wcp-radius-full);
+	background: radial-gradient(circle, rgba(var(--wcp-primary-rgb), 0.3), transparent 70%);
+}
+
+.wcp-line-item__placeholder svg {
+	position: relative;
+	opacity: 0.85;
+}
+
+.wcp-line-item__qty {
+	position: absolute;
+	top: -7px;
+	right: -7px;
+	display: grid;
+	place-items: center;
+	min-width: 22px;
+	height: 22px;
+	padding: 0 6px;
+	border: 2px solid var(--wcp-surface);
+	border-radius: var(--wcp-radius-full);
+	background: var(--wcp-text-strong);
+	color: var(--wcp-surface);
+	font-size: var(--wcp-text-2xs);
+	font-weight: 700;
+	font-variant-numeric: tabular-nums;
+	box-shadow: var(--wcp-shadow-sm);
+}
+
+.wcp-line-item__body {
+	display: flex;
+	flex-direction: column;
+	gap: 3px;
+	min-width: 0;
+}
+
+.wcp-line-item__name {
+	color: var(--wcp-text-strong);
+	font-size: var(--wcp-text-md);
+	font-weight: 600;
+	letter-spacing: -0.01em;
+	overflow-wrap: anywhere;
+}
+
+.wcp-portal .wcp-line-item__name a {
+	color: inherit;
+	background-image: linear-gradient(var(--wcp-primary), var(--wcp-primary));
+	background-repeat: no-repeat;
+	background-size: 0% 1px;
+	background-position: 0 100%;
+	transition: background-size var(--wcp-transition-normal), color var(--wcp-transition-fast);
+}
+
+.wcp-line-item__name a:hover {
+	color: var(--wcp-primary);
+	background-size: 100% 1px;
+}
+
+.wcp-line-item__sku {
+	color: var(--wcp-muted-soft);
+	font-family: var(--wcp-font-mono);
+	font-size: var(--wcp-text-2xs);
+	letter-spacing: 0.02em;
+}
+
+.wcp-line-item__meta {
+	color: var(--wcp-muted);
+	font-size: var(--wcp-text-xs);
+}
+
+.wcp-line-item__meta ul {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 4px 12px;
+}
+
+.wcp-line-item__meta p,
+.wcp-line-item__meta li {
+	display: inline;
+}
+
+.wcp-line-item__price {
+	color: var(--wcp-text-strong);
+	font-size: var(--wcp-text-md);
+	font-weight: 700;
+	font-variant-numeric: tabular-nums;
+	white-space: nowrap;
+}
+
+/* --- Totals ------------------------------------------------------------- */
+
+/* Prefixed: the scoped reset zeroes every <dl>'s margin at (0,1,1). */
+.wcp-portal .wcp-totals {
+	display: flex;
+	flex-direction: column;
+	gap: 8px;
+	margin: 0 var(--wcp-space-4) var(--wcp-space-4);
+	padding: var(--wcp-space-4) var(--wcp-space-5);
+	border: 1px solid var(--wcp-border);
+	border-radius: var(--wcp-radius-md);
+	background: var(--wcp-bg-elevated);
+}
+
+.wcp-totals__row {
+	display: flex;
+	align-items: baseline;
+	justify-content: space-between;
+	gap: var(--wcp-space-4);
+	color: var(--wcp-muted);
+	font-size: var(--wcp-text-sm);
+}
+
+.wcp-totals__row dd {
+	color: var(--wcp-text);
+	font-variant-numeric: tabular-nums;
+	text-align: right;
+}
+
+.wcp-totals__row--grand {
+	margin-top: 6px;
+	padding-top: 12px;
+	border-top: 1px solid var(--wcp-border-strong);
+	color: var(--wcp-text-strong);
+	font-size: var(--wcp-text-md);
+	font-weight: 700;
+}
+
+.wcp-totals__row--grand dd {
+	color: var(--wcp-primary);
+	font-size: var(--wcp-text-xl);
+	font-weight: 800;
+	letter-spacing: -0.02em;
+}
+
+/* --- Downloads ---------------------------------------------------------- */
+
+.wcp-downloads {
+	display: flex;
+	flex-direction: column;
+}
+
+.wcp-download {
+	display: grid;
+	grid-template-columns: auto minmax(0, 1fr) auto;
+	align-items: center;
+	gap: var(--wcp-space-4);
+	padding: var(--wcp-space-4) var(--wcp-space-6);
+}
+
+.wcp-download + .wcp-download {
+	border-top: 1px solid var(--wcp-border);
+}
+
+.wcp-download__icon {
+	display: grid;
+	place-items: center;
+	width: 42px;
+	height: 42px;
+	border-radius: 12px;
+	background: var(--wcp-primary-soft);
+	color: var(--wcp-primary);
+}
+
+.wcp-download__body {
+	display: flex;
+	flex-direction: column;
+	gap: 2px;
+	min-width: 0;
+}
+
+.wcp-download__name {
+	color: var(--wcp-text-strong);
+	font-size: var(--wcp-text-sm);
+	font-weight: 600;
+	overflow-wrap: anywhere;
+}
+
+.wcp-download__meta {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 4px 12px;
+	color: var(--wcp-muted-soft);
+	font-size: var(--wcp-text-xs);
+}
+
+/* --- Addresses in an order ---------------------------------------------- */
+
+.wcp-address-block {
+	display: flex;
+	flex-direction: column;
+	gap: var(--wcp-space-4);
+	padding: var(--wcp-space-5) var(--wcp-space-6);
+}
+
+.wcp-address {
+	color: var(--wcp-text);
+	font-size: var(--wcp-text-md);
+	line-height: 1.7;
+}
+
+.wcp-address__none {
+	color: var(--wcp-muted-soft);
+	font-size: var(--wcp-text-sm);
+}
+
+/* Prefixed: this pill is a <p>, and the reset would flatten its padding. */
+.wcp-portal .wcp-address__meta {
+	display: inline-flex;
+	align-items: center;
+	gap: 8px;
+	align-self: flex-start;
+	padding: 6px 12px 6px 10px;
+	border: 1px solid var(--wcp-border);
+	border-radius: var(--wcp-radius-full);
+	background: var(--wcp-bg-elevated);
+	color: var(--wcp-muted);
+	font-size: var(--wcp-text-xs);
+	font-weight: 600;
+}
+
+.wcp-address__meta svg {
+	color: var(--wcp-primary);
+}
+
+/* Prefixed: the note is a <p>, and the reset would strip its inset. */
+.wcp-portal .wcp-order__note {
+	padding: var(--wcp-space-5) var(--wcp-space-6);
+	color: var(--wcp-text);
+	font-size: var(--wcp-text-md);
+	line-height: 1.65;
+	white-space: pre-line;
+}
+
+/* ==========================================================================
+   17. Forms & account
+   ========================================================================== */
+
+.wcp-account {
+	display: flex;
+	flex-direction: column;
+	gap: var(--wcp-space-5);
+}
+
+/* --- Profile hero ------------------------------------------------------- */
+
+.wcp-profile-head {
+	position: relative;
+	overflow: hidden;
+	display: flex;
+	align-items: center;
+	gap: var(--wcp-space-7);
+	padding: var(--wcp-space-7) var(--wcp-space-8);
+	border: 1px solid var(--wcp-border);
+	border-radius: var(--wcp-radius-xl);
+	background: linear-gradient(180deg, var(--wcp-surface) 0%, var(--wcp-surface-tint) 100%);
+	box-shadow: var(--wcp-shadow-lg), var(--wcp-inset-highlight);
+}
+
+.wcp-profile-head__glow {
+	position: absolute;
+	top: -60%;
+	left: -10%;
+	width: 50%;
+	aspect-ratio: 1;
+	border-radius: var(--wcp-radius-full);
+	background: radial-gradient(circle, rgba(var(--wcp-primary-rgb), 0.18), transparent 66%);
+	pointer-events: none;
+}
+
+.wcp-profile-head__avatar {
+	position: relative;
+	z-index: 1;
+	display: grid;
+	place-items: center;
+	flex: none;
+	width: 132px;
+	height: 132px;
+	transform-style: preserve-3d;
+}
+
+.wcp-profile-head__halo {
+	position: absolute;
+	inset: 0;
+	border-radius: 40px;
+	background: conic-gradient(from 210deg, rgba(var(--wcp-primary-rgb), 0.35), rgba(var(--wcp-accent-2-rgb), 0.2), rgba(var(--wcp-primary-rgb), 0.05), rgba(var(--wcp-primary-rgb), 0.35));
+	filter: blur(14px);
+	opacity: 0.9;
+}
+
+.wcp-profile-head__body {
+	position: relative;
+	z-index: 1;
+	display: flex;
+	flex-direction: column;
+	gap: 6px;
+	min-width: 0;
+}
+
+.wcp-profile-head__eyebrow {
+	color: var(--wcp-muted-soft);
+	font-size: var(--wcp-text-2xs);
+	font-weight: 700;
+	letter-spacing: 0.12em;
+	text-transform: uppercase;
+}
+
+.wcp-portal .wcp-profile-head__name {
+	font-size: var(--wcp-text-3xl);
+	font-weight: 800;
+	letter-spacing: -0.03em;
+	line-height: 1.05;
+	overflow-wrap: anywhere;
+}
+
+.wcp-profile-head__email {
+	display: inline-flex;
+	align-items: center;
+	gap: 8px;
+	color: var(--wcp-muted);
+	font-size: var(--wcp-text-md);
+	overflow-wrap: anywhere;
+}
+
+.wcp-profile-head__email svg {
+	color: var(--wcp-muted-soft);
+}
+
+/* Prefixed: this pill is a <p>, and the reset would flatten its padding. */
+.wcp-portal .wcp-profile-head__meta {
+	display: inline-flex;
+	align-items: center;
+	gap: 8px;
+	align-self: flex-start;
+	margin-top: 4px;
+	padding: 6px 12px 6px 10px;
+	border: 1px solid var(--wcp-border);
+	border-radius: var(--wcp-radius-full);
+	background: var(--wcp-surface-blur);
+	color: var(--wcp-muted);
+	font-size: var(--wcp-text-xs);
+	font-weight: 600;
+}
+
+.wcp-profile-head__meta svg {
+	color: var(--wcp-primary);
+}
+
+/* --- Form shell --------------------------------------------------------- */
+
+.wcp-form__body {
+	display: flex;
+	flex-direction: column;
+	gap: var(--wcp-space-5);
+	padding: var(--wcp-space-6);
+}
+
+.wcp-form__grid {
+	display: grid;
+	grid-template-columns: repeat(2, minmax(0, 1fr));
+	gap: var(--wcp-space-5) var(--wcp-space-4);
+}
+
+.wcp-form__actions {
+	display: flex;
+	align-items: center;
+	justify-content: flex-end;
+	gap: var(--wcp-space-3);
+	padding: var(--wcp-space-4) var(--wcp-space-6);
+	border-top: 1px solid var(--wcp-border);
+	border-radius: 0 0 var(--wcp-radius) var(--wcp-radius);
+	background: var(--wcp-bg-elevated);
+}
+
+.wcp-form[data-wcp-busy] .wcp-form__body {
+	opacity: 0.75;
+	pointer-events: none;
+	transition: opacity var(--wcp-transition-fast);
+}
+
+/* --- Field -------------------------------------------------------------- */
+
+.wcp-field {
+	display: flex;
+	flex-direction: column;
+	gap: 7px;
+	grid-column: span 2;
+	min-width: 0;
+}
+
+.wcp-field--half {
+	grid-column: span 1;
+}
+
+.wcp-field__label {
+	display: flex;
+	align-items: baseline;
+	gap: 6px;
+	color: var(--wcp-text-strong);
+	font-size: var(--wcp-text-sm);
+	font-weight: 600;
+	letter-spacing: -0.005em;
+}
+
+.wcp-field__required {
+	color: var(--wcp-danger);
+	font-weight: 700;
+}
+
+.wcp-field__optional {
+	margin-left: auto;
+	color: var(--wcp-muted-soft);
+	font-size: var(--wcp-text-xs);
+	font-weight: 500;
+}
+
+.wcp-portal .wcp-input {
+	display: block;
+	width: 100%;
+	min-height: 44px;
+	padding: 10px 14px;
+	border: 1px solid var(--wcp-border-strong);
+	border-radius: 12px;
+	background: var(--wcp-surface);
+	color: var(--wcp-text-strong);
+	font-size: var(--wcp-text-base);
+	line-height: 1.4;
+	box-shadow: var(--wcp-shadow-xs), var(--wcp-inset-highlight);
+	transition: border-color var(--wcp-transition-fast), box-shadow var(--wcp-transition-fast), background-color var(--wcp-transition-fast);
+}
+
+.wcp-portal .wcp-input::placeholder {
+	color: var(--wcp-muted-soft);
+	opacity: 1;
+}
+
+.wcp-portal .wcp-input:hover {
+	border-color: rgba(var(--wcp-primary-rgb), 0.4);
+}
+
+.wcp-portal .wcp-input:focus,
+.wcp-portal .wcp-input:focus-visible {
+	outline: none;
+	border-color: var(--wcp-primary);
+	box-shadow: var(--wcp-ring), var(--wcp-inset-highlight);
+}
+
+.wcp-portal .wcp-input[aria-invalid="true"] {
+	border-color: var(--wcp-danger);
+}
+
+.wcp-portal .wcp-input[aria-invalid="true"]:focus {
+	box-shadow: 0 0 0 3px rgba(163, 40, 45, 0.18);
+}
+
+.wcp-portal .wcp-input:disabled {
+	opacity: 0.6;
+	cursor: not-allowed;
+}
+
+/* --- Select ------------------------------------------------------------- */
+
+.wcp-select-wrap {
+	position: relative;
+}
+
+.wcp-portal .wcp-select {
+	padding-right: 40px;
+	cursor: pointer;
+}
+
+.wcp-select-wrap__chevron {
+	position: absolute;
+	top: 50%;
+	right: 14px;
+	display: grid;
+	color: var(--wcp-muted-soft);
+	transform: translateY(-50%) rotate(90deg);
+	pointer-events: none;
+	transition: color var(--wcp-transition-fast), transform var(--wcp-transition-fast);
+}
+
+.wcp-select-wrap:focus-within .wcp-select-wrap__chevron {
+	color: var(--wcp-primary);
+	transform: translateY(-50%) rotate(90deg) translateX(1px);
+}
+
+/* --- Hint and error ----------------------------------------------------- */
+
+.wcp-field__hint {
+	color: var(--wcp-muted-soft);
+	font-size: var(--wcp-text-xs);
+	line-height: 1.5;
+}
+
+.wcp-field__error {
+	display: flex;
+	align-items: flex-start;
+	gap: 6px;
+	color: var(--wcp-danger);
+	font-size: var(--wcp-text-xs);
+	font-weight: 600;
+	line-height: 1.45;
+	animation: wcp-rise 240ms var(--wcp-ease-out) both;
+}
+
+.wcp-field__error[hidden] {
+	display: none;
+}
+
+.wcp-field__error svg {
+	margin-top: 1px;
+}
+
+/* --- Feedback ----------------------------------------------------------- */
+
+.wcp-feedback {
+	display: flex;
+	align-items: flex-start;
+	gap: 10px;
+	padding: 12px 14px;
+	border: 1px solid var(--wcp-border);
+	border-radius: var(--wcp-radius-md);
+	background: var(--wcp-bg-elevated);
+	color: var(--wcp-text);
+	font-size: var(--wcp-text-sm);
+	font-weight: 500;
+	line-height: 1.5;
+	animation: wcp-rise 260ms var(--wcp-ease-out) both;
+}
+
+.wcp-feedback[hidden] {
+	display: none;
+}
+
+.wcp-feedback__icon {
+	display: grid;
+	place-items: center;
+	flex: none;
+	width: 22px;
+	height: 22px;
+	border-radius: var(--wcp-radius-full);
+	background: var(--wcp-neutral);
+	color: #fff;
+}
+
+.wcp-feedback--success {
+	border-color: rgba(13, 122, 88, 0.3);
+	background: var(--wcp-success-soft);
+	color: var(--wcp-success);
+}
+
+.wcp-feedback--success .wcp-feedback__icon {
+	background: var(--wcp-success);
+	color: var(--wcp-success-soft);
+	animation: wcp-check-pop 460ms var(--wcp-ease-out) both;
+}
+
+.wcp-feedback--error {
+	border-color: rgba(163, 40, 45, 0.3);
+	background: var(--wcp-danger-soft);
+	color: var(--wcp-danger);
+}
+
+.wcp-feedback--error .wcp-feedback__icon {
+	background: var(--wcp-danger);
+	color: var(--wcp-danger-soft);
+}
+
+/* --- Address cards ------------------------------------------------------ */
+
+.wcp-address-card {
+	overflow: visible;
+	transition: transform var(--wcp-transition-normal), box-shadow var(--wcp-transition-normal), border-color var(--wcp-transition-normal);
+}
+
+.wcp-address-card:hover {
+	transform: translateY(var(--wcp-lift));
+	box-shadow: var(--wcp-shadow-lg), var(--wcp-inset-highlight);
+}
+
+/* A restrained embossed pattern in the corner: the "card" in address card. */
+.wcp-address-card__pattern {
+	position: absolute;
+	top: 0;
+	right: 0;
+	width: 46%;
+	height: 120px;
+	border-radius: 0 var(--wcp-radius) 0 0;
+	background-image: radial-gradient(rgba(var(--wcp-primary-rgb), 0.16) 1px, transparent 1.5px);
+	background-size: 14px 14px;
+	-webkit-mask-image: radial-gradient(ellipse at 100% 0%, #000 10%, transparent 70%);
+	mask-image: radial-gradient(ellipse at 100% 0%, #000 10%, transparent 70%);
+	pointer-events: none;
+}
+
+.wcp-address-card__head {
+	position: relative;
+	z-index: 1;
+	flex-direction: row;
+	align-items: center;
+	gap: var(--wcp-space-3);
+}
+
+.wcp-address-card__icon {
+	display: grid;
+	place-items: center;
+	flex: none;
+	width: 44px;
+	height: 44px;
+	border-radius: 14px;
+	background: linear-gradient(145deg, var(--wcp-primary-hover), var(--wcp-primary));
+	color: var(--wcp-primary-contrast);
+	box-shadow: 0 10px 20px -10px rgba(var(--wcp-primary-rgb), 0.8), inset 0 1px 0 rgba(255, 255, 255, 0.3);
+}
+
+.wcp-address-card__heading {
+	display: flex;
+	flex-direction: column;
+	gap: 2px;
+	min-width: 0;
+	flex: 1;
+}
+
+.wcp-address-card__blurb {
+	color: var(--wcp-muted);
+	font-size: var(--wcp-text-xs);
+}
+
+.wcp-address-card__state {
+	display: inline-flex;
+	align-items: center;
+	gap: 5px;
+	flex: none;
+	padding: 4px 9px 4px 7px;
+	border-radius: var(--wcp-radius-full);
+	font-size: var(--wcp-text-2xs);
+	font-weight: 700;
+	letter-spacing: 0.04em;
+	text-transform: uppercase;
+}
+
+.wcp-address-card__state--set {
+	background: var(--wcp-success-soft);
+	color: var(--wcp-success);
+}
+
+.wcp-address-card__state--empty {
+	background: var(--wcp-neutral-soft);
+	color: var(--wcp-neutral);
+}
+
+.wcp-address-card__body {
+	position: relative;
+	z-index: 1;
+	flex: 1;
+	padding: var(--wcp-space-5) var(--wcp-space-6);
+}
+
+.wcp-address-card .wcp-address {
+	font-size: var(--wcp-text-md);
+	line-height: 1.75;
+	letter-spacing: -0.005em;
+}
+
+.wcp-address-card__empty {
+	display: flex;
+	flex-direction: column;
+	gap: 6px;
+	padding: var(--wcp-space-4);
+	border: 1px dashed var(--wcp-border-strong);
+	border-radius: var(--wcp-radius-md);
+}
+
+.wcp-address-card__empty-art {
+	display: grid;
+	place-items: center;
+	width: 38px;
+	height: 38px;
+	margin-bottom: 4px;
+	border-radius: 11px;
+	background: var(--wcp-bg-subtle);
+	color: var(--wcp-muted);
+}
+
+.wcp-address-card__empty-title {
+	color: var(--wcp-text-strong);
+	font-size: var(--wcp-text-sm);
+	font-weight: 600;
+}
+
+.wcp-address-card__empty-text {
+	color: var(--wcp-muted);
+	font-size: var(--wcp-text-xs);
+}
+
+.wcp-address-card__edit {
+	position: relative;
+	z-index: 1;
+}
+
+/* --- Address notes ------------------------------------------------------ */
+
+.wcp-notes {
+	display: grid;
+	grid-template-columns: repeat(3, minmax(0, 1fr));
+	gap: var(--wcp-space-3);
+}
+
+.wcp-note {
+	display: flex;
+	align-items: flex-start;
+	gap: 12px;
+	padding: var(--wcp-space-4);
+	border: 1px solid var(--wcp-border);
+	border-radius: var(--wcp-radius-md);
+	background: var(--wcp-surface-blur);
+	box-shadow: var(--wcp-inset-highlight);
+}
+
+.wcp-note__icon {
+	display: grid;
+	place-items: center;
+	flex: none;
+	width: 34px;
+	height: 34px;
+	border-radius: 10px;
+	background: var(--wcp-primary-soft);
+	color: var(--wcp-primary);
+}
+
+.wcp-note__body {
+	display: flex;
+	flex-direction: column;
+	gap: 2px;
+}
+
+.wcp-note__title {
+	color: var(--wcp-text-strong);
+	font-size: var(--wcp-text-sm);
+	font-weight: 600;
+}
+
+.wcp-note__text {
+	color: var(--wcp-muted);
+	font-size: var(--wcp-text-xs);
+	line-height: 1.5;
+}
+
+/* ==========================================================================
+   18. Dashboard
+   ========================================================================== */
+
+/* --- Hero --------------------------------------------------------------- */
+
+.wcp-hero {
+	position: relative;
+	overflow: hidden;
+	display: grid;
+	grid-template-columns: minmax(0, 1fr) auto;
+	align-items: center;
+	gap: var(--wcp-space-7);
+	padding: var(--wcp-space-7) var(--wcp-space-8);
+	border: 1px solid var(--wcp-border);
+	border-radius: var(--wcp-radius-xl);
+	background:
+		radial-gradient(110% 130% at 100% 0%, rgba(var(--wcp-primary-rgb), 0.06), transparent 60%),
+		linear-gradient(180deg, var(--wcp-surface) 0%, var(--wcp-surface-tint) 100%);
+	box-shadow: var(--wcp-shadow-lg), var(--wcp-inset-highlight);
+}
+
+.wcp-hero__glow {
+	position: absolute;
+	top: -50%;
+	right: -6%;
+	width: 52%;
+	aspect-ratio: 1;
+	border-radius: var(--wcp-radius-full);
+	background: radial-gradient(circle, rgba(var(--wcp-primary-rgb), 0.2), rgba(var(--wcp-accent-2-rgb), 0.06) 45%, transparent 68%);
+	pointer-events: none;
+}
+
+.wcp-hero__content {
+	position: relative;
+	z-index: 1;
+	display: flex;
+	flex-direction: column;
+	gap: var(--wcp-space-3);
+	min-width: 0;
+}
+
+.wcp-hero__eyebrow {
+	display: inline-flex;
+	align-items: center;
+	gap: 8px;
+	color: var(--wcp-muted-soft);
+	font-size: var(--wcp-text-2xs);
+	font-weight: 700;
+	letter-spacing: 0.12em;
+	text-transform: uppercase;
+}
+
+.wcp-hero__eyebrow-dot {
+	width: 7px;
+	height: 7px;
+	border-radius: var(--wcp-radius-full);
+	background: var(--wcp-primary);
+	animation: wcp-pulse-dot 2.6s ease-out infinite;
+}
+
+.wcp-portal .wcp-hero__title {
+	font-size: var(--wcp-text-3xl);
+	font-weight: 800;
+	letter-spacing: -0.032em;
+	line-height: 1.08;
+	overflow-wrap: anywhere;
+}
+
+.wcp-hero__text {
+	max-width: 560px;
+	color: var(--wcp-muted);
+	font-size: var(--wcp-text-md);
+	line-height: 1.6;
+}
+
+.wcp-hero .wcp-meta-list {
+	margin-top: var(--wcp-space-2);
+}
+
+.wcp-hero__aside {
+	position: relative;
+	z-index: 1;
+}
+
+/* Identity card: the avatar as a physical object -- layered rings, a sheen,
+   the initials forward on Z. */
+.wcp-identity {
+	position: relative;
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	gap: 10px;
+	width: 196px;
+	padding: var(--wcp-space-6) var(--wcp-space-4) var(--wcp-space-5);
+	border: 1px solid var(--wcp-border);
+	border-radius: 24px;
+	background: linear-gradient(160deg, var(--wcp-surface) 0%, var(--wcp-bg-elevated) 100%);
+	box-shadow: var(--wcp-shadow-lg), var(--wcp-inset-highlight);
+	transform-style: preserve-3d;
+	overflow: hidden;
+}
+
+.wcp-identity__sheen {
+	position: absolute;
+	inset: 0;
+	background: linear-gradient(115deg, transparent 35%, rgba(255, 255, 255, 0.28) 50%, transparent 62%);
+	pointer-events: none;
+}
+
+.wcp-identity__ring {
+	position: absolute;
+	border-radius: var(--wcp-radius-full);
+	border: 1px solid rgba(var(--wcp-primary-rgb), 0.22);
+	pointer-events: none;
+}
+
+.wcp-identity__ring--a {
+	top: -40px;
+	left: -30px;
+	width: 180px;
+	height: 180px;
+	animation: wcp-drift 18s var(--wcp-ease-in-out) infinite;
+}
+
+.wcp-identity__ring--b {
+	right: -50px;
+	bottom: -40px;
+	width: 150px;
+	height: 150px;
+	border-color: rgba(var(--wcp-accent-2-rgb), 0.25);
+	animation: wcp-drift 24s var(--wcp-ease-in-out) infinite reverse;
+}
+
+.wcp-identity__name {
+	position: relative;
+	max-width: 100%;
+	overflow: hidden;
+	color: var(--wcp-text-strong);
+	font-size: var(--wcp-text-sm);
+	font-weight: 700;
+	letter-spacing: -0.01em;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+}
+
+.wcp-identity__badge {
+	position: relative;
+	display: inline-flex;
+	align-items: center;
+	gap: 5px;
+	padding: 4px 10px 4px 8px;
+	white-space: nowrap;
+	border-radius: var(--wcp-radius-full);
+	background: var(--wcp-primary-soft);
+	color: var(--wcp-primary);
+	font-size: var(--wcp-text-2xs);
+	font-weight: 700;
+	letter-spacing: 0.04em;
+	text-transform: uppercase;
+}
+
+/* --- Metric cards ------------------------------------------------------- */
+
+.wcp-metrics {
+	display: grid;
+	grid-template-columns: repeat(4, minmax(0, 1fr));
+	gap: var(--wcp-space-4);
+}
+
+.wcp-metric {
+	position: relative;
+	display: flex;
+	flex-direction: column;
+	gap: 10px;
+	min-width: 0;
+	padding: var(--wcp-space-4) var(--wcp-space-5) var(--wcp-space-4);
+	border: 1px solid var(--wcp-border);
+	border-radius: var(--wcp-radius);
+	background: linear-gradient(180deg, var(--wcp-surface) 0%, var(--wcp-surface-tint) 100%);
+	box-shadow: var(--wcp-shadow-md), var(--wcp-inset-highlight);
+	color: var(--wcp-text);
+	transition: transform var(--wcp-transition-normal), box-shadow var(--wcp-transition-normal), border-color var(--wcp-transition-normal);
+}
+
+.wcp-metric > * {
+	position: relative;
+	z-index: 1;
+}
+
+/* The `> *` rule above would otherwise make the spotlight a flow
+   element and knock the card's own layout out of alignment. */
+.wcp-metric > .wcp-card-3d__spot {
+	position: absolute;
+	z-index: 0;
+}
+
+.wcp-portal .wcp-metric--link {
+	color: var(--wcp-text);
+}
+
+.wcp-metric--link:hover {
+	border-color: rgba(var(--wcp-primary-rgb), 0.3);
+	box-shadow: var(--wcp-shadow-lg), var(--wcp-glow), var(--wcp-inset-highlight);
+}
+
+.wcp-metric__icon {
+	display: grid;
+	place-items: center;
+	width: 34px;
+	height: 34px;
+	border-radius: 11px;
+	background: linear-gradient(145deg, var(--wcp-primary-hover), var(--wcp-primary));
+	color: var(--wcp-primary-contrast);
+	box-shadow: 0 10px 20px -10px rgba(var(--wcp-primary-rgb), 0.85), inset 0 1px 0 rgba(255, 255, 255, 0.3);
+	transition: transform var(--wcp-transition-normal);
+}
+
+.wcp-metric--link:hover .wcp-metric__icon {
+	transform: translateY(-2px) rotate(-4deg);
+}
+
+.wcp-metric__label {
+	color: var(--wcp-muted-soft);
+	font-size: var(--wcp-text-2xs);
+	font-weight: 700;
+	letter-spacing: 0.1em;
+	text-transform: uppercase;
+}
+
+.wcp-metric__value {
+	display: block;
+	margin-top: -4px;
+	color: var(--wcp-text-strong);
+	font-size: var(--wcp-text-2xl);
+	font-weight: 800;
+	letter-spacing: -0.03em;
+	line-height: 1.08;
+	font-variant-numeric: tabular-nums;
+	overflow-wrap: anywhere;
+}
+
+/* A value that is a word rather than a figure sits a size down, so "Needs
+   attention" does not shout over "12". */
+.wcp-metric__value--text {
+	font-size: var(--wcp-text-lg);
+	letter-spacing: -0.015em;
+}
+
+.wcp-metric__value .woocommerce-Price-currencySymbol {
+	margin-right: 1px;
+	font-size: 0.62em;
+	font-weight: 700;
+	vertical-align: 0.28em;
+	letter-spacing: 0;
+}
+
+.wcp-metric__foot {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	gap: var(--wcp-space-3);
+	min-height: 22px;
+	margin-top: auto;
+}
+
+.wcp-metric__text {
+	color: var(--wcp-muted);
+	font-size: var(--wcp-text-xs);
+	line-height: 1.45;
+}
+
+.wcp-metric__arrow {
+	display: grid;
+	place-items: center;
+	flex: none;
+	width: 26px;
+	height: 26px;
+	border-radius: var(--wcp-radius-full);
+	background: var(--wcp-primary-soft);
+	color: var(--wcp-primary);
+	opacity: 0;
+	transform: translateX(-4px);
+	transition: opacity var(--wcp-transition-fast), transform var(--wcp-transition-fast);
+}
+
+.wcp-metric--link:hover .wcp-metric__arrow,
+.wcp-metric--link:focus-visible .wcp-metric__arrow {
+	opacity: 1;
+	transform: translateX(0);
+}
+
+@media (hover: hover) and (pointer: fine) {
+	.wcp-portal[data-wcp-3d="off"] .wcp-metric--link:hover {
+		transform: translateY(var(--wcp-lift));
+	}
+}
+
+/* --- Setup, progress and steps ------------------------------------------ */
+
+/*
+ * The one percentage in the portal. It counts completed setup steps out of
+ * offered setup steps, and it is never the only way to read the state: the
+ * bar carries a `progressbar` role with a spoken value, and the same count is
+ * printed beside it in words.
+ */
+.wcp-setup {
+	display: flex;
+	flex-direction: column;
+	gap: var(--wcp-space-5);
+	padding: var(--wcp-space-5) var(--wcp-space-6) var(--wcp-space-6);
+}
+
+.wcp-setup--compact {
+	gap: var(--wcp-space-4);
+	padding: var(--wcp-space-4) var(--wcp-space-5) var(--wcp-space-5);
+}
+
+.wcp-progress {
+	display: flex;
+	flex-direction: column;
+	gap: var(--wcp-space-2);
+}
+
+.wcp-progress__track {
+	position: relative;
+	overflow: hidden;
+	height: 8px;
+	border-radius: var(--wcp-radius-full);
+	background: var(--wcp-bg-subtle);
+	box-shadow: inset 0 1px 2px rgba(var(--wcp-shadow-color), 0.12);
+}
+
+.wcp-progress__fill {
+	display: block;
+	width: var(--wcp-progress, 0%);
+	height: 100%;
+	border-radius: inherit;
+	background: linear-gradient(90deg, var(--wcp-primary), rgba(var(--wcp-accent-2-rgb), 0.9));
+	box-shadow: 0 0 12px -2px rgba(var(--wcp-primary-rgb), 0.6);
+	/*
+	 * Drawn from empty on first paint so the bar reads as a measurement being
+	 * taken, not a decoration. It scales rather than growing its width: an
+	 * animated `width` is a layout animation, and would land in the page's
+	 * cumulative layout shift. Reduced motion holds it at its value.
+	 */
+	transform-origin: left center;
+	animation: wcp-fill var(--wcp-duration-slow) var(--wcp-ease-out) both;
+}
+
+@keyframes wcp-fill {
+	from {
+		transform: scaleX(0);
+	}
+
+	to {
+		transform: scaleX(1);
+	}
+}
+
+.wcp-progress__meta {
+	color: var(--wcp-muted);
+	font-size: var(--wcp-text-xs);
+	font-weight: 600;
+}
+
+.wcp-progress__badge {
+	display: inline-flex;
+	align-items: center;
+	flex: none;
+	padding: 5px 11px;
+	border-radius: var(--wcp-radius-full);
+	background: var(--wcp-primary-soft);
+	color: var(--wcp-primary);
+	font-size: var(--wcp-text-xs);
+	font-weight: 700;
+	font-variant-numeric: tabular-nums;
+	letter-spacing: -0.01em;
+	box-shadow: inset 0 0 0 1px rgba(var(--wcp-primary-rgb), 0.16);
+}
+
+.wcp-steps {
+	display: flex;
+	flex-direction: column;
+	gap: var(--wcp-space-2);
+	counter-reset: wcp-step;
+}
+
+.wcp-steps__item {
+	position: relative;
+}
+
+/* The rail joining the markers, drawn behind them. */
+.wcp-steps__item:not(:last-child)::before {
+	content: "";
+	position: absolute;
+	top: 44px;
+	bottom: -8px;
+	left: 32px;
+	width: 2px;
+	border-radius: 2px;
+	background: var(--wcp-border);
+}
+
+.wcp-steps__item.is-done::before {
+	background: rgba(var(--wcp-primary-rgb), 0.35);
+}
+
+.wcp-portal .wcp-step {
+	position: relative;
+	display: grid;
+	grid-template-columns: auto minmax(0, 1fr) auto auto;
+	align-items: center;
+	gap: var(--wcp-space-4);
+	padding: var(--wcp-space-3) var(--wcp-space-4);
+	border: 1px solid transparent;
+	border-radius: var(--wcp-radius-md);
+	color: var(--wcp-text);
+	transition: background-color var(--wcp-transition-fast), border-color var(--wcp-transition-fast), transform var(--wcp-transition-fast);
+}
+
+a.wcp-step:hover {
+	border-color: var(--wcp-border);
+	background: var(--wcp-surface-hover);
+	transform: translateX(2px);
+}
+
+.wcp-step__index {
+	display: grid;
+	place-items: center;
+	flex: none;
+	width: 34px;
+	height: 34px;
+	border-radius: 12px;
+	border: 1px solid var(--wcp-border);
+	background: var(--wcp-bg-elevated);
+	color: var(--wcp-muted-soft);
+	font-size: var(--wcp-text-xs);
+	font-weight: 700;
+	font-variant-numeric: tabular-nums;
+	letter-spacing: 0.02em;
+	transition: background-color var(--wcp-transition-fast), color var(--wcp-transition-fast), border-color var(--wcp-transition-fast), box-shadow var(--wcp-transition-fast);
+}
+
+.is-done .wcp-step__index {
+	border-color: transparent;
+	background: linear-gradient(145deg, var(--wcp-primary-hover), var(--wcp-primary));
+	color: var(--wcp-primary-contrast);
+	box-shadow: 0 8px 16px -10px rgba(var(--wcp-primary-rgb), 0.9);
+}
+
+.is-current .wcp-step__index {
+	border-color: rgba(var(--wcp-primary-rgb), 0.4);
+	background: var(--wcp-primary-soft);
+	color: var(--wcp-primary);
+	box-shadow: 0 0 0 4px rgba(var(--wcp-primary-rgb), 0.1);
+}
+
+.wcp-step__body {
+	display: flex;
+	flex-direction: column;
+	gap: 2px;
+	min-width: 0;
+}
+
+.wcp-step__label {
+	color: var(--wcp-text-strong);
+	font-size: var(--wcp-text-base);
+	font-weight: 650;
+	letter-spacing: -0.008em;
+}
+
+.is-done .wcp-step__label {
+	color: var(--wcp-muted);
+}
+
+.wcp-step__text {
+	color: var(--wcp-muted);
+	font-size: var(--wcp-text-xs);
+	line-height: 1.45;
+}
+
+.wcp-step__state {
+	flex: none;
+	padding: 3px 9px;
+	border-radius: var(--wcp-radius-full);
+	background: var(--wcp-neutral-soft);
+	color: var(--wcp-neutral);
+	font-size: var(--wcp-text-2xs);
+	font-weight: 700;
+	letter-spacing: 0.04em;
+	text-transform: uppercase;
+	white-space: nowrap;
+}
+
+.is-done .wcp-step__state {
+	background: var(--wcp-success-soft);
+	color: var(--wcp-success);
+}
+
+.is-current .wcp-step__state {
+	background: var(--wcp-primary-soft);
+	color: var(--wcp-primary);
+}
+
+.wcp-step__arrow {
+	display: grid;
+	place-items: center;
+	flex: none;
+	width: 24px;
+	height: 24px;
+	color: var(--wcp-muted-soft);
+	transition: transform var(--wcp-transition-fast), color var(--wcp-transition-fast);
+}
+
+a.wcp-step:hover .wcp-step__arrow {
+	color: var(--wcp-primary);
+	transform: translateX(3px);
+}
+
+/* --- Next step (compact rail card) -------------------------------------- */
+
+.wcp-portal .wcp-next {
+	display: grid;
+	grid-template-columns: auto minmax(0, 1fr) auto;
+	align-items: center;
+	gap: var(--wcp-space-3);
+	padding: var(--wcp-space-3) var(--wcp-space-4);
+	border: 1px solid var(--wcp-border);
+	border-radius: var(--wcp-radius-md);
+	background: var(--wcp-surface);
+	color: var(--wcp-text);
+	box-shadow: var(--wcp-shadow-xs);
+	transition: border-color var(--wcp-transition-fast), box-shadow var(--wcp-transition-fast), transform var(--wcp-transition-fast);
+}
+
+.wcp-next:hover {
+	border-color: rgba(var(--wcp-primary-rgb), 0.35);
+	box-shadow: var(--wcp-shadow-sm);
+	transform: translateY(-1px);
+}
+
+.wcp-next__icon {
+	display: grid;
+	place-items: center;
+	flex: none;
+	width: 30px;
+	height: 30px;
+	border-radius: 10px;
+	background: var(--wcp-primary-soft);
+	color: var(--wcp-primary);
+}
+
+.wcp-next__body {
+	display: flex;
+	flex-direction: column;
+	gap: 1px;
+	min-width: 0;
+}
+
+.wcp-next__label {
+	color: var(--wcp-text-strong);
+	font-size: var(--wcp-text-sm);
+	font-weight: 650;
+}
+
+.wcp-next__text {
+	color: var(--wcp-muted);
+	font-size: var(--wcp-text-xs);
+	line-height: 1.4;
+}
+
+.wcp-next__arrow {
+	flex: none;
+	color: var(--wcp-primary);
+	transition: transform var(--wcp-transition-fast);
+}
+
+.wcp-next:hover .wcp-next__arrow {
+	transform: translateX(3px);
+}
+
+/* --- Quick actions ------------------------------------------------------ */
+
+/*
+ * One column in the rail, where the panel is narrow and a stack of compact
+ * rows reads best; two columns once the panel goes full width, so the tiles
+ * do not stretch into banners. The switch lives in the responsive section.
+ */
+.wcp-actions {
+	display: grid;
+	grid-template-columns: minmax(0, 1fr);
+	align-content: space-between;
+	flex: 1 1 auto;
+	gap: var(--wcp-space-2);
+	padding: var(--wcp-space-4) var(--wcp-space-5) var(--wcp-space-5);
+}
+
+.wcp-portal .wcp-action {
+	position: relative;
+	display: grid;
+	grid-template-columns: auto minmax(0, 1fr) auto;
+	align-items: center;
+	gap: var(--wcp-space-3);
+	height: 100%;
+	padding: var(--wcp-space-3);
+	border: 1px solid var(--wcp-border);
+	border-radius: var(--wcp-radius-md);
+	background: var(--wcp-surface);
+	color: var(--wcp-text);
+	box-shadow: var(--wcp-shadow-xs), var(--wcp-inset-highlight);
+	transition: border-color var(--wcp-transition-fast), box-shadow var(--wcp-transition-fast), transform var(--wcp-transition-fast), background-color var(--wcp-transition-fast);
+}
+
+.wcp-action > * {
+	position: relative;
+	z-index: 1;
+}
+
+/* The `> *` rule above would otherwise make the spotlight a flow
+   element and knock the card's own layout out of alignment. */
+.wcp-action > .wcp-action__spot {
+	position: absolute;
+	z-index: 0;
+}
+
+.wcp-action:hover {
+	border-color: rgba(var(--wcp-primary-rgb), 0.32);
+	background: var(--wcp-surface-hover);
+	box-shadow: var(--wcp-shadow-sm), var(--wcp-inset-highlight);
+	transform: translateY(-2px);
+}
+
+.wcp-action__icon {
+	display: grid;
+	place-items: center;
+	flex: none;
+	width: 32px;
+	height: 32px;
+	border-radius: 10px;
+	background: var(--wcp-primary-soft);
+	color: var(--wcp-primary);
+	box-shadow: inset 0 0 0 1px rgba(var(--wcp-primary-rgb), 0.12);
+	transition: transform var(--wcp-transition-fast), background-color var(--wcp-transition-fast);
+}
+
+.wcp-action:hover .wcp-action__icon {
+	background: var(--wcp-primary-soft-hover);
+	transform: translateY(-1px);
+}
+
+.wcp-action__label {
+	min-width: 0;
+	color: var(--wcp-text-strong);
+	font-size: var(--wcp-text-sm);
+	font-weight: 600;
+	line-height: 1.3;
+}
+
+.wcp-action__arrow {
+	flex: none;
+	color: var(--wcp-muted-soft);
+	opacity: 0;
+	transform: translateX(-4px);
+	transition: opacity var(--wcp-transition-fast), transform var(--wcp-transition-fast), color var(--wcp-transition-fast);
+}
+
+.wcp-action:hover .wcp-action__arrow,
+.wcp-action:focus-visible .wcp-action__arrow {
+	color: var(--wcp-primary);
+	opacity: 1;
+	transform: translateX(0);
+}
+
+/* --- Store discovery ---------------------------------------------------- */
+
+.wcp-products {
+	display: grid;
+	grid-template-columns: repeat(2, minmax(0, 1fr));
+	align-content: start;
+	gap: var(--wcp-space-3);
+	padding: var(--wcp-space-5) var(--wcp-space-6) var(--wcp-space-6);
+}
+
+.wcp-portal .wcp-product {
+	position: relative;
+	display: grid;
+	grid-template-columns: auto minmax(0, 1fr) auto;
+	align-items: center;
+	gap: var(--wcp-space-3);
+	height: 100%;
+	padding: var(--wcp-space-3);
+	border: 1px solid var(--wcp-border);
+	border-radius: var(--wcp-radius-md);
+	background: linear-gradient(180deg, var(--wcp-surface) 0%, var(--wcp-surface-tint) 100%);
+	color: var(--wcp-text);
+	box-shadow: var(--wcp-shadow-xs), var(--wcp-inset-highlight);
+	transition: border-color var(--wcp-transition-normal), box-shadow var(--wcp-transition-normal), transform var(--wcp-transition-normal);
+}
+
+.wcp-product > * {
+	position: relative;
+	z-index: 1;
+}
+
+/* The `> *` rule above would otherwise make the spotlight a flow
+   element and knock the card's own layout out of alignment. */
+.wcp-product > .wcp-product__spot {
+	position: absolute;
+	z-index: 0;
+}
+
+.wcp-product:hover {
+	border-color: rgba(var(--wcp-primary-rgb), 0.3);
+	box-shadow: var(--wcp-shadow-md), var(--wcp-inset-highlight);
+}
+
+.wcp-product__media {
+	display: grid;
+	place-items: center;
+	overflow: hidden;
+	flex: none;
+	width: 52px;
+	height: 52px;
+	border-radius: 12px;
+	border: 1px solid var(--wcp-border);
+	background: var(--wcp-bg-subtle);
+}
+
+.wcp-product__image {
+	width: 100%;
+	height: 100%;
+	object-fit: cover;
+}
+
+/* Never a blank tile: a product without a photograph still gets a mark. */
+.wcp-product__placeholder {
+	display: grid;
+	place-items: center;
+	width: 100%;
+	height: 100%;
+	background:
+		radial-gradient(120% 120% at 30% 0%, rgba(var(--wcp-primary-rgb), 0.18), transparent 70%),
+		var(--wcp-primary-soft);
+	color: var(--wcp-primary);
+}
+
+.wcp-product__body {
+	display: flex;
+	flex-direction: column;
+	gap: 3px;
+	min-width: 0;
+}
+
+.wcp-product__name {
+	display: -webkit-box;
+	overflow: hidden;
+	-webkit-box-orient: vertical;
+	-webkit-line-clamp: 2;
+	color: var(--wcp-text-strong);
+	font-size: var(--wcp-text-sm);
+	font-weight: 650;
+	line-height: 1.35;
+}
+
+.wcp-product__price {
+	color: var(--wcp-muted);
+	font-size: var(--wcp-text-xs);
+	font-weight: 600;
+	font-variant-numeric: tabular-nums;
+}
+
+.wcp-product__price del {
+	margin-right: 4px;
+	opacity: 0.65;
+}
+
+.wcp-product__price ins {
+	color: var(--wcp-primary);
+	font-weight: 700;
+}
+
+.wcp-product__arrow {
+	flex: none;
+	align-self: flex-start;
+	color: var(--wcp-muted-soft);
+	opacity: 0;
+	transition: opacity var(--wcp-transition-fast), color var(--wcp-transition-fast), transform var(--wcp-transition-fast);
+}
+
+.wcp-product:hover .wcp-product__arrow,
+.wcp-product:focus-visible .wcp-product__arrow {
+	color: var(--wcp-primary);
+	opacity: 1;
+	transform: translate(1px, -1px);
+}
+
+/* --- Recent orders ------------------------------------------------------ */
+
+.wcp-mini-orders {
+	display: flex;
+	flex-direction: column;
+	padding: var(--wcp-space-2);
+}
+
+.wcp-portal .wcp-mini-order {
+	position: relative;
+	display: flex;
+	align-items: center;
+	gap: var(--wcp-space-3);
+	padding: 12px 14px;
+	border-radius: var(--wcp-radius-md);
+	color: var(--wcp-text);
+	transition: background-color var(--wcp-transition-fast), transform var(--wcp-transition-fast), box-shadow var(--wcp-transition-fast);
+}
+
+.wcp-mini-order:hover {
+	background: var(--wcp-surface-hover);
+	box-shadow: var(--wcp-shadow-sm), var(--wcp-inset-highlight);
+	transform: translateY(-1px);
+}
+
+.wcp-mini-order__glyph {
+	display: grid;
+	place-items: center;
+	flex: none;
+	width: 38px;
+	height: 38px;
+	border-radius: 12px;
+	background: var(--wcp-bg-subtle);
+	color: var(--wcp-muted);
+	transition: background-color var(--wcp-transition-fast), color var(--wcp-transition-fast), transform var(--wcp-transition-fast);
+}
+
+.wcp-mini-order:hover .wcp-mini-order__glyph {
+	background: var(--wcp-primary-soft);
+	color: var(--wcp-primary);
+	transform: translateY(-1px);
+}
+
+.wcp-mini-order__main {
+	display: flex;
+	flex-direction: column;
+	gap: 2px;
+	min-width: 0;
+	flex: 1;
+}
+
+.wcp-mini-order__number {
+	color: var(--wcp-text-strong);
+	font-size: var(--wcp-text-sm);
+	font-weight: 700;
+	font-variant-numeric: tabular-nums;
+}
+
+.wcp-mini-order__meta {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 6px;
+	color: var(--wcp-muted-soft);
+	font-size: var(--wcp-text-xs);
+	overflow: hidden;
+}
+
+.wcp-mini-order__teaser {
+	flex-basis: 100%;
+	overflow: hidden;
+	color: var(--wcp-muted);
+	text-overflow: ellipsis;
+	white-space: nowrap;
+}
+
+.wcp-mini-order__side {
+	display: flex;
+	align-items: center;
+	gap: var(--wcp-space-3);
+	flex: none;
+}
+
+.wcp-mini-order__total {
+	min-width: 72px;
+	color: var(--wcp-text-strong);
+	font-size: var(--wcp-text-sm);
+	font-weight: 700;
+	font-variant-numeric: tabular-nums;
+	text-align: right;
+}
+
+.wcp-mini-order__arrow {
+	display: grid;
+	color: var(--wcp-muted-soft);
+	transition: transform var(--wcp-transition-fast), color var(--wcp-transition-fast);
+}
+
+.wcp-mini-order:hover .wcp-mini-order__arrow {
+	color: var(--wcp-primary);
+	transform: translateX(3px);
+}
+
+/* --- Account health ----------------------------------------------------- */
+
+.wcp-health {
+	display: flex;
+	flex-direction: column;
+	padding: var(--wcp-space-2);
+}
+
+.wcp-portal .wcp-health__link {
+	display: flex;
+	align-items: center;
+	gap: 12px;
+	width: 100%;
+	padding: 9px 12px;
+	border-radius: var(--wcp-radius-md);
+	color: var(--wcp-text);
+	text-align: left;
+	transition: background-color var(--wcp-transition-fast);
+}
+
+.wcp-health__link:hover {
+	background: var(--wcp-surface-hover);
+}
+
+/* A row with nowhere to go does not pretend to be clickable. */
+.wcp-portal .wcp-health__link--static {
+	cursor: default;
+}
+
+.wcp-health__link--static:hover {
+	background: none;
+}
+
+.wcp-health__icon {
+	display: grid;
+	place-items: center;
+	flex: none;
+	width: 30px;
+	height: 30px;
+	border-radius: var(--wcp-radius-full);
+}
+
+.wcp-health__icon--ok {
+	background: var(--wcp-success-soft);
+	color: var(--wcp-success);
+}
+
+.wcp-health__icon--todo {
+	background: var(--wcp-warning-soft);
+	color: var(--wcp-warning);
+}
+
+.wcp-health__icon--accent {
+	background: var(--wcp-primary-soft);
+	color: var(--wcp-primary);
+}
+
+.wcp-health__body {
+	display: flex;
+	flex-direction: column;
+	gap: 1px;
+	min-width: 0;
+	flex: 1;
+}
+
+.wcp-health__label {
+	color: var(--wcp-text-strong);
+	font-size: var(--wcp-text-sm);
+	font-weight: 600;
+}
+
+.wcp-health__state {
+	flex: none;
+	overflow: hidden;
+	max-width: 45%;
+	padding: 3px 9px;
+	border-radius: var(--wcp-radius-full);
+	background: var(--wcp-neutral-soft);
+	color: var(--wcp-neutral);
+	font-size: var(--wcp-text-2xs);
+	font-weight: 700;
+	letter-spacing: 0.02em;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+}
+
+.wcp-health__state--ok {
+	background: var(--wcp-success-soft);
+	color: var(--wcp-success);
+}
+
+.wcp-health__state--todo {
+	background: var(--wcp-warning-soft);
+	color: var(--wcp-warning);
+}
+
+.wcp-health__action {
+	color: var(--wcp-muted-soft);
+	transition: transform var(--wcp-transition-fast), color var(--wcp-transition-fast);
+}
+
+.wcp-health__link:hover .wcp-health__action {
+	color: var(--wcp-primary);
+	transform: translateX(2px);
+}
+
+.wcp-portal .wcp-health__shop {
+	display: flex;
+	align-items: center;
+	gap: 10px;
+	margin: var(--wcp-space-2) var(--wcp-space-4) var(--wcp-space-4);
+	padding: 12px 14px;
+	border: 1px solid rgba(var(--wcp-primary-rgb), 0.2);
+	border-radius: var(--wcp-radius-md);
+	background: linear-gradient(135deg, var(--wcp-primary-soft), var(--wcp-surface));
+	color: var(--wcp-primary);
+	font-size: var(--wcp-text-sm);
+	font-weight: 700;
+	transition: transform var(--wcp-transition-fast), box-shadow var(--wcp-transition-fast);
+}
+
+.wcp-health__shop:hover {
+	transform: translateY(-1px);
+	box-shadow: var(--wcp-glow);
+}
+
+.wcp-health__shop-icon {
+	display: grid;
+	place-items: center;
+	width: 30px;
+	height: 30px;
+	border-radius: 9px;
+	background: var(--wcp-primary);
+	color: var(--wcp-primary-contrast);
+}
+
+.wcp-health__shop > svg:last-child {
+	margin-left: auto;
+}
+
+/* --- Activity ----------------------------------------------------------- */
+
+.wcp-activity {
+	position: relative;
+	display: grid;
+	grid-template-columns: repeat(3, minmax(0, 1fr));
+	gap: var(--wcp-space-2);
+	padding: var(--wcp-space-4) var(--wcp-space-5) var(--wcp-space-5);
+}
+
+.wcp-activity__item {
+	display: flex;
+	align-items: flex-start;
+	gap: 12px;
+	padding: 12px;
+	border: 1px solid var(--wcp-border);
+	border-radius: var(--wcp-radius-md);
+	background: var(--wcp-bg-elevated);
+	transition: transform var(--wcp-transition-fast), box-shadow var(--wcp-transition-fast);
+}
+
+.wcp-activity__item:hover {
+	transform: translateY(-1px);
+	box-shadow: var(--wcp-shadow-sm), var(--wcp-inset-highlight);
+}
+
+.wcp-activity__marker {
+	display: grid;
+	place-items: center;
+	flex: none;
+	width: 28px;
+	height: 28px;
+	border-radius: var(--wcp-radius-full);
+	background: var(--wcp-neutral-soft);
+	color: var(--wcp-neutral);
+}
+
+.wcp-activity__marker--success {
+	background: var(--wcp-success-soft);
+	color: var(--wcp-success);
+}
+
+.wcp-activity__marker--info {
+	background: var(--wcp-info-soft);
+	color: var(--wcp-info);
+}
+
+.wcp-activity__body {
+	display: flex;
+	flex-direction: column;
+	gap: 2px;
+	min-width: 0;
+}
+
+.wcp-activity__text {
+	color: var(--wcp-text-strong);
+	font-size: var(--wcp-text-sm);
+	font-weight: 600;
+	line-height: 1.35;
+}
+
+.wcp-activity__time {
+	color: var(--wcp-muted-soft);
+	font-size: var(--wcp-text-xs);
+}
+
+/* --- Dashboard skeleton ------------------------------------------------- */
+
+.wcp-skeleton--dash {
+	display: flex;
+	flex-direction: column;
+	gap: var(--wcp-space-7);
+	max-width: var(--wcp-content-max);
+	margin: 0 auto;
+}
+
+.wcp-skeleton__block {
+	height: auto;
+	border-radius: var(--wcp-radius);
+	animation: wcp-rise var(--wcp-duration-normal) var(--wcp-ease-out) both;
+	animation-delay: calc(var(--wcp-stagger, 0) * var(--wcp-stagger-step));
+}
+
+.wcp-skeleton__block--hero {
+	height: 196px;
+	border-radius: var(--wcp-radius-xl);
+}
+
+.wcp-skeleton__cards {
+	display: grid;
+	grid-template-columns: repeat(4, minmax(0, 1fr));
+	gap: var(--wcp-space-4);
+}
+
+.wcp-skeleton__block--metric {
+	height: 158px;
+}
+
+.wcp-skeleton__block--panel {
+	height: 300px;
+}
+
+/* ==========================================================================
+   19. Portal footer
+   ========================================================================== */
+
+/*
+ * The application's own footer -- not the theme's. It closes the portal on
+ * every section, which is what stops a short screen (Addresses, a finished
+ * form) from trailing off into empty canvas. The shell places it after
+ * `.wcp-main`, and `.wcp-main` carries `flex: 1`, so on a short page the
+ * footer settles at the bottom of the viewport and on a long one it simply
+ * follows the content. It is never fixed and never overlaps anything.
+ *
+ * The surface is deliberately not a card: a recessed ground with a hairline of
+ * accent along its top edge, so it reads as the end of the page rather than as
+ * one more panel on it.
+ */
+.wcp-footer {
+	position: relative;
+	z-index: 1;
+	overflow: hidden;
+	/* Its own container, so the footer adapts to the width it actually has --
+	   correct in a narrow theme column as well as at full width. */
+	container-type: inline-size;
+	container-name: wcp-footer;
+	margin-top: auto;
+	border-top: 1px solid var(--wcp-border);
+	background:
+		linear-gradient(180deg, rgba(var(--wcp-primary-rgb), 0.04) 0%, transparent 38%),
+		linear-gradient(180deg, var(--wcp-bg-elevated) 0%, var(--wcp-bg-subtle) 100%);
+}
+
+/* A hairline of accent light along the top edge, fading out at both ends. */
+.wcp-footer::before {
+	content: "";
+	position: absolute;
+	top: 0;
+	left: 10%;
+	right: 10%;
+	height: 1px;
+	background: linear-gradient(90deg, transparent, rgba(var(--wcp-primary-rgb), 0.35), transparent);
+	pointer-events: none;
+}
+
+.wcp-footer__glow {
+	position: absolute;
+	top: -180px;
+	right: -80px;
+	width: min(520px, 48%);
+	aspect-ratio: 1;
+	border-radius: var(--wcp-radius-full);
+	background: radial-gradient(circle at 50% 50%, rgba(var(--wcp-primary-rgb), 0.12), transparent 66%);
+	pointer-events: none;
+}
+
+.wcp-footer__inner {
+	position: relative;
+	z-index: 1;
+	display: grid;
+	grid-template-columns: minmax(260px, 1.5fr) minmax(0, 1.5fr) minmax(190px, 0.9fr);
+	gap: var(--wcp-space-7);
+	max-width: var(--wcp-content-max);
+	margin: 0 auto;
+	padding: var(--wcp-space-8) var(--wcp-space-8) var(--wcp-space-7);
+}
+
+/* --- Brand column ------------------------------------------------------- */
+
+.wcp-footer__brand {
+	display: grid;
+	grid-template-columns: auto minmax(0, 1fr);
+	align-items: center;
+	gap: var(--wcp-space-2) var(--wcp-space-3);
+	min-width: 0;
+}
+
+.wcp-footer__mark {
+	display: grid;
+	place-items: center;
+	flex: none;
+	width: 38px;
+	height: 38px;
+	border-radius: 12px;
+	background: linear-gradient(145deg, var(--wcp-primary-hover) 0%, var(--wcp-primary) 60%, rgba(var(--wcp-accent-2-rgb), 1) 150%);
+	color: var(--wcp-primary-contrast);
+	box-shadow: 0 8px 18px -10px rgba(var(--wcp-primary-rgb), 0.8), inset 0 1px 0 rgba(255, 255, 255, 0.32);
+}
+
+.wcp-footer__identity {
+	display: flex;
+	flex-direction: column;
+	gap: 1px;
+	min-width: 0;
+}
+
+.wcp-footer__store {
+	overflow: hidden;
+	color: var(--wcp-text-strong);
+	font-size: var(--wcp-text-md);
+	font-weight: 700;
+	letter-spacing: -0.015em;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+}
+
+.wcp-footer__eyebrow {
+	color: var(--wcp-muted-soft);
+	font-size: 10px;
+	font-weight: 700;
+	letter-spacing: 0.1em;
+	text-transform: uppercase;
+}
+
+.wcp-footer__text {
+	grid-column: 1 / -1;
+	max-width: 34ch;
+	color: var(--wcp-muted);
+	font-size: var(--wcp-text-sm);
+	line-height: 1.6;
+}
+
+/* --- Compact actions ---------------------------------------------------- */
+
+.wcp-footer__actions {
+	grid-column: 1 / -1;
+	display: flex;
+	flex-wrap: wrap;
+	gap: var(--wcp-space-2);
+	margin-top: 2px;
+}
+
+.wcp-portal .wcp-footer__action {
+	display: inline-flex;
+	align-items: center;
+	gap: 7px;
+	padding: 7px 12px 7px 8px;
+	border: 1px solid var(--wcp-border);
+	border-radius: var(--wcp-radius-full);
+	background: var(--wcp-surface);
+	color: var(--wcp-text);
+	font-size: var(--wcp-text-xs);
+	font-weight: 600;
+	box-shadow: var(--wcp-shadow-xs), var(--wcp-inset-highlight);
+	transition: transform var(--wcp-transition-fast), border-color var(--wcp-transition-fast), box-shadow var(--wcp-transition-fast), color var(--wcp-transition-fast);
+}
+
+.wcp-footer__action:hover {
+	transform: translateY(-2px);
+	border-color: rgba(var(--wcp-primary-rgb), 0.34);
+	color: var(--wcp-text-strong);
+	box-shadow: var(--wcp-shadow-sm), var(--wcp-inset-highlight);
+}
+
+.wcp-footer__action-icon {
+	display: grid;
+	place-items: center;
+	flex: none;
+	width: 22px;
+	height: 22px;
+	border-radius: var(--wcp-radius-full);
+	background: var(--wcp-primary-soft);
+	color: var(--wcp-primary);
+	transition: transform var(--wcp-transition-fast), background-color var(--wcp-transition-fast);
+}
+
+.wcp-footer__action:hover .wcp-footer__action-icon {
+	background: var(--wcp-primary-soft-hover);
+	transform: translateY(-1px);
+}
+
+/* --- Link groups -------------------------------------------------------- */
+
+.wcp-footer__nav {
+	display: grid;
+	grid-template-columns: repeat(2, minmax(0, 1fr));
+	gap: var(--wcp-space-6);
+	min-width: 0;
+}
+
+.wcp-footer__group,
+.wcp-footer__status {
+	display: flex;
+	flex-direction: column;
+	gap: var(--wcp-space-3);
+	min-width: 0;
+}
+
+.wcp-portal .wcp-footer__title {
+	color: var(--wcp-muted-soft);
+	font-size: var(--wcp-text-2xs);
+	font-weight: 700;
+	letter-spacing: 0.11em;
+	text-transform: uppercase;
+}
+
+.wcp-footer__links {
+	display: flex;
+	flex-direction: column;
+	gap: 2px;
+}
+
+.wcp-portal .wcp-footer__link {
+	display: inline-flex;
+	align-items: center;
+	gap: 6px;
+	padding: 4px 0;
+	color: var(--wcp-muted);
+	font-size: var(--wcp-text-sm);
+	font-weight: 500;
+	transition: color var(--wcp-transition-fast), transform var(--wcp-transition-fast);
+}
+
+.wcp-footer__link:hover {
+	color: var(--wcp-text-strong);
+	transform: translateX(2px);
+}
+
+.wcp-portal .wcp-footer__link.is-current {
+	color: var(--wcp-primary);
+	font-weight: 650;
+}
+
+.wcp-footer__link-arrow {
+	color: var(--wcp-primary);
+	opacity: 0;
+	transform: translateX(-4px);
+	transition: opacity var(--wcp-transition-fast), transform var(--wcp-transition-fast);
+}
+
+.wcp-footer__link:hover .wcp-footer__link-arrow,
+.wcp-footer__link:focus-visible .wcp-footer__link-arrow {
+	opacity: 1;
+	transform: translateX(0);
+}
+
+/* --- Account state ------------------------------------------------------ */
+
+.wcp-footer__state {
+	display: flex;
+	flex-direction: column;
+	gap: 4px;
+}
+
+.wcp-footer__state-row {
+	display: grid;
+	grid-template-columns: auto minmax(0, 1fr) auto;
+	align-items: center;
+	gap: var(--wcp-space-2);
+	padding: 6px 8px;
+	border: 1px solid transparent;
+	border-radius: var(--wcp-radius-sm);
+	transition: background-color var(--wcp-transition-fast), border-color var(--wcp-transition-fast);
+}
+
+.wcp-footer__state-row:hover {
+	border-color: var(--wcp-border);
+	background: var(--wcp-surface);
+}
+
+.wcp-footer__state-icon {
+	display: grid;
+	place-items: center;
+	flex: none;
+	width: 22px;
+	height: 22px;
+	border-radius: var(--wcp-radius-full);
+}
+
+.wcp-footer__state-icon--ok {
+	background: var(--wcp-success-soft);
+	color: var(--wcp-success);
+}
+
+.wcp-footer__state-icon--todo {
+	background: var(--wcp-warning-soft);
+	color: var(--wcp-warning);
+}
+
+.wcp-footer__state-icon--accent {
+	background: var(--wcp-primary-soft);
+	color: var(--wcp-primary);
+}
+
+.wcp-footer__state-label {
+	overflow: hidden;
+	color: var(--wcp-muted);
+	font-size: var(--wcp-text-xs);
+	text-overflow: ellipsis;
+	white-space: nowrap;
+}
+
+.wcp-footer__state-value {
+	flex: none;
+	color: var(--wcp-text-strong);
+	font-size: var(--wcp-text-xs);
+	font-weight: 700;
+}
+
+.wcp-footer__state-value--todo {
+	color: var(--wcp-warning);
+}
+
+.wcp-footer__state-value--accent {
+	color: var(--wcp-primary);
+}
+
+/* --- Bottom bar --------------------------------------------------------- */
+
+/*
+ * The rule spans the full width while its contents stay aligned with the
+ * content column above, which is what the asymmetric padding is doing.
+ */
+.wcp-footer__bar {
+	position: relative;
+	z-index: 1;
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	flex-wrap: wrap;
+	gap: var(--wcp-space-3) var(--wcp-space-5);
+	padding: var(--wcp-space-4) max(var(--wcp-space-8), calc((100% - var(--wcp-content-max)) / 2));
+	border-top: 1px solid var(--wcp-border);
+	background: rgba(var(--wcp-shadow-color), 0.018);
+}
+
+.wcp-footer__copyright {
+	color: var(--wcp-muted-soft);
+	font-size: var(--wcp-text-xs);
+}
+
+.wcp-footer__legal {
+	display: flex;
+	flex-wrap: wrap;
+	align-items: center;
+	gap: var(--wcp-space-2) var(--wcp-space-4);
+}
+
+.wcp-portal .wcp-footer__legal-link {
+	color: var(--wcp-muted);
+	font-size: var(--wcp-text-xs);
+	font-weight: 600;
+	transition: color var(--wcp-transition-fast);
+}
+
+.wcp-footer__legal-link:hover {
+	color: var(--wcp-primary);
+}
+
+/* --- Footer responsive --------------------------------------------------- */
+
+@container wcp-footer (max-width: 900px) {
+	.wcp-footer__inner {
+		grid-template-columns: repeat(2, minmax(0, 1fr));
+		gap: var(--wcp-space-6);
+		padding: var(--wcp-space-7) var(--wcp-space-6) var(--wcp-space-6);
+	}
+
+	.wcp-footer__brand {
+		grid-column: 1 / -1;
+	}
+
+	.wcp-footer__text {
+		max-width: 52ch;
+	}
+}
+
+@container wcp-footer (max-width: 560px) {
+	.wcp-footer__inner {
+		grid-template-columns: minmax(0, 1fr);
+		gap: var(--wcp-space-6);
+		padding: var(--wcp-space-6) var(--wcp-space-5);
+	}
+
+	/* Two columns of links still read well at phone width; four narrow
+	   desktop columns would not. */
+	.wcp-footer__nav {
+		gap: var(--wcp-space-4);
+	}
+
+	/* Tap targets, not inline pills. */
+	.wcp-footer__actions {
+		display: grid;
+		grid-template-columns: repeat(2, minmax(0, 1fr));
+		gap: var(--wcp-space-2);
+	}
+
+	.wcp-portal .wcp-footer__action {
+		justify-content: flex-start;
+		padding: 9px 12px 9px 9px;
+	}
+
+	.wcp-portal .wcp-footer__link {
+		padding: 7px 0;
+	}
+
+	.wcp-footer__bar {
+		flex-direction: column;
+		align-items: flex-start;
+		padding: var(--wcp-space-4) var(--wcp-space-5);
+	}
+}
+
+/* --- Reveal -------------------------------------------------------------- */
+
+/*
+ * The hidden state is only ever applied to an element script has marked,
+ * so without JavaScript -- or under reduced motion, where the script does not
+ * arm it at all -- the footer is simply present.
+ */
+.wcp-footer[data-wcp-reveal-ready] {
+	opacity: 0;
+	translate: 0 10px;
+	transition: opacity var(--wcp-duration-slow) var(--wcp-ease-out), translate var(--wcp-duration-slow) var(--wcp-ease-out);
+}
+
+.wcp-footer[data-wcp-reveal-ready].is-revealed {
+	opacity: 1;
+	translate: 0 0;
+}
+
+/* --- Compact (signed-out) ------------------------------------------------ */
+
+/*
+ * The sign-in screen carries the same footer identity at a whisper: the bar
+ * only, transparent over the ambient canvas, so it closes the page without
+ * competing with the card in the middle of it.
+ */
+.wcp-footer--compact {
+	margin-top: 0;
+	border-top: 0;
+	background: none;
+}
+
+.wcp-footer--compact::before {
+	display: none;
+}
+
+.wcp-footer--compact .wcp-footer__glow {
+	display: none;
+}
+
+.wcp-footer--compact .wcp-footer__bar {
+	border-top: 1px solid var(--wcp-border);
+	background: none;
+	max-width: var(--wcp-gate-max);
+	margin: 0 auto;
+	padding: var(--wcp-space-4) clamp(20px, 4vw, 56px);
+}
+
+/* ==========================================================================
+   20. Responsive
+   ========================================================================== */
+
+/* Content-driven breakpoints: the portal adapts to its container, so it looks
+   correct in a narrow theme column as well as a full-width template. */
+
+@container wcp-content (max-width: 1040px) {
+	.wcp-metrics {
+		grid-template-columns: repeat(2, minmax(0, 1fr));
+	}
+
+	.wcp-skeleton__cards {
+		grid-template-columns: repeat(2, minmax(0, 1fr));
+	}
+}
+
+/*
+ * Orders stop being a table when the columns can no longer hold their meaning.
+ * Each row becomes a card: the grid template is redefined, the presentational
+ * header is dropped, and the per-cell labels that were hidden on desktop take
+ * over the job of naming each value.
+ */
+@container wcp-content (max-width: 900px) {
+	.wcp-orders {
+		background: none;
+		border: 0;
+		border-radius: 0;
+		box-shadow: none;
+		overflow: visible;
+	}
+
+	.wcp-orders__head {
+		display: none;
+	}
+
+	.wcp-orders__list {
+		gap: var(--wcp-space-3);
+	}
+
+	.wcp-orders__item + .wcp-orders__item {
+		border-top: 0;
+	}
+
+	.wcp-portal .wcp-order-row {
+		grid-template-columns: minmax(0, 1fr) auto;
+		gap: var(--wcp-space-3) var(--wcp-space-4);
+		padding: var(--wcp-space-4);
+		background: linear-gradient(180deg, var(--wcp-surface) 0%, var(--wcp-surface-tint) 100%);
+		border: 1px solid var(--wcp-border);
+		border-radius: var(--wcp-radius);
+		box-shadow: var(--wcp-shadow-sm), var(--wcp-inset-highlight);
+	}
+
+	.wcp-order-row::before {
+		display: none;
+	}
+
+	.wcp-order-row:hover {
+		transform: translateY(-2px);
+		box-shadow: var(--wcp-shadow-md), var(--wcp-inset-highlight);
+	}
+
+	.wcp-order-row:focus-visible {
+		box-shadow: var(--wcp-ring);
+	}
+
+	.wcp-order-row__label {
+		display: block;
+		margin-bottom: 2px;
+	}
+
+	.wcp-orders__col--order {
+		grid-row: 1;
+		grid-column: 1;
+	}
+
+	.wcp-orders__col--order .wcp-order-row__label {
+		display: none;
+	}
+
+	.wcp-orders__col--status {
+		grid-row: 1;
+		grid-column: 2;
+		align-self: center;
+		justify-self: end;
+		text-align: right;
+	}
+
+	.wcp-orders__col--status .wcp-order-row__label {
+		display: none;
+	}
+
+	.wcp-orders__col--date,
+	.wcp-orders__col--items,
+	.wcp-orders__col--total {
+		display: flex;
+		flex-direction: row;
+		align-items: baseline;
+		justify-content: space-between;
+		gap: var(--wcp-space-4);
+		grid-column: span 2;
+		padding-top: var(--wcp-space-3);
+		border-top: 1px dashed var(--wcp-border);
+	}
+
+	.wcp-orders__col--date .wcp-order-row__label,
+	.wcp-orders__col--items .wcp-order-row__label,
+	.wcp-orders__col--total .wcp-order-row__label {
+		margin-bottom: 0;
+	}
+
+	.wcp-order-row__teaser {
+		display: none;
+	}
+
+	.wcp-orders__col--action {
+		grid-column: span 2;
+	}
+
+	.wcp-order-row__cta {
+		justify-content: center;
+		width: 100%;
+		padding: 10px;
+		opacity: 1;
+		transform: none;
+	}
+
+	.wcp-skeleton__row {
+		grid-template-columns: minmax(0, 1fr) auto;
+		border: 1px solid var(--wcp-border);
+		border-radius: var(--wcp-radius);
+		margin-bottom: var(--wcp-space-3);
+		background: var(--wcp-surface);
+	}
+
+	.wcp-skeleton__bar--date,
+	.wcp-skeleton__bar--items,
+	.wcp-skeleton__bar--total {
+		grid-column: span 2;
+	}
+
+	.wcp-skeleton__bar--action {
+		display: none;
+	}
+
+	.wcp-grid--wide,
+	.wcp-grid--split,
+	.wcp-grid--even {
+		grid-template-columns: minmax(0, 1fr);
+	}
+
+	.wcp-activity {
+		grid-template-columns: repeat(2, minmax(0, 1fr));
+	}
+
+	/* The rail is no longer a rail: its cards sit side by side instead of
+	   stretching to the full width one under the other. */
+	.wcp-rail {
+		display: grid;
+		grid-template-columns: repeat(2, minmax(0, 1fr));
+		align-items: start;
+	}
+
+	.wcp-rail > :only-child {
+		grid-column: span 2;
+	}
+
+	.wcp-actions {
+		grid-template-columns: repeat(2, minmax(0, 1fr));
+	}
+
+	/* An odd tile last in the row spans it rather than leaving a gap. */
+	.wcp-actions__item:last-child:nth-child(odd) {
+		grid-column: span 2;
+	}
+}
+
+@container wcp-content (max-width: 760px) {
+	.wcp-hero {
+		grid-template-columns: minmax(0, 1fr);
+		padding: var(--wcp-space-6);
+	}
+
+	.wcp-hero__aside {
+		order: -1;
+	}
+
+	.wcp-identity {
+		flex-direction: row;
+		width: auto;
+		padding: var(--wcp-space-3) var(--wcp-space-4);
+		gap: var(--wcp-space-3);
+	}
+
+	.wcp-identity .wcp-avatar--xl {
+		width: 56px;
+		height: 56px;
+		border-radius: 16px;
+		font-size: var(--wcp-text-xl);
+	}
+
+	.wcp-identity__name {
+		flex: 1;
+		overflow: hidden;
+		font-size: var(--wcp-text-md);
+		text-align: left;
+		text-overflow: ellipsis;
+		white-space: nowrap;
+	}
+
+	/* The badge moves to the end of the row rather than disappearing: it is
+	   what stops the stacked card reading as half empty. The name keeps
+	   priority for the space between them. */
+	.wcp-identity__badge {
+		flex: 0 1 auto;
+		min-width: 0;
+		margin-left: auto;
+		overflow: hidden;
+	}
+
+	.wcp-portal .wcp-hero__title {
+		font-size: var(--wcp-text-2xl);
+	}
+
+	.wcp-order__summary,
+	.wcp-profile-head {
+		padding: var(--wcp-space-6);
+	}
+
+	.wcp-profile-head {
+		flex-direction: column;
+		align-items: flex-start;
+		gap: var(--wcp-space-5);
+	}
+
+	.wcp-profile-head__avatar {
+		width: 100px;
+		height: 100px;
+	}
+
+	.wcp-profile-head .wcp-avatar--xl {
+		width: 80px;
+		height: 80px;
+		border-radius: 24px;
+		font-size: var(--wcp-text-2xl);
+	}
+
+	.wcp-portal .wcp-profile-head__name {
+		font-size: var(--wcp-text-2xl);
+	}
+
+	.wcp-order__facts {
+		grid-template-columns: repeat(2, minmax(0, 1fr));
+	}
+
+	.wcp-order__fact {
+		min-width: 0;
+	}
+
+	.wcp-order__fact--total {
+		grid-column: span 2;
+	}
+
+	.wcp-activity,
+	.wcp-notes {
+		grid-template-columns: minmax(0, 1fr);
+	}
+
+	.wcp-section__head--row {
+		align-items: flex-start;
+	}
+}
+
+@container wcp-content (max-width: 620px) {
+	/* Status cards stay two-up: they are compact enough to read at half a
+	   phone's width, and stacking five of them would bury the page. */
+	.wcp-metrics,
+	.wcp-skeleton__cards {
+		grid-template-columns: repeat(2, minmax(0, 1fr));
+		gap: var(--wcp-space-3);
+	}
+
+	.wcp-metric {
+		padding: var(--wcp-space-4);
+	}
+
+	.wcp-portal .wcp-metric__value {
+		font-size: var(--wcp-text-xl);
+	}
+
+	.wcp-portal .wcp-metric__value--text {
+		font-size: var(--wcp-text-md);
+	}
+
+	.wcp-rail,
+	.wcp-actions,
+	.wcp-products {
+		grid-template-columns: minmax(0, 1fr);
+	}
+
+	.wcp-rail > :only-child,
+	.wcp-actions__item:last-child:nth-child(odd) {
+		grid-column: auto;
+	}
+
+	.wcp-setup,
+	.wcp-products {
+		padding: var(--wcp-space-4);
+	}
+
+	/* No room for the badge beside the name; the pair centres instead of
+	   sitting against one edge of a wide card. */
+	.wcp-identity {
+		justify-content: center;
+	}
+
+	.wcp-identity__name {
+		flex: 0 1 auto;
+	}
+
+	.wcp-identity__badge {
+		display: none;
+	}
+
+	.wcp-portal .wcp-step {
+		grid-template-columns: auto minmax(0, 1fr) auto;
+		gap: var(--wcp-space-3);
+		padding: var(--wcp-space-3) 0;
+	}
+
+	/* The arrow is redundant once the whole row is the tap target. */
+	.wcp-step__arrow {
+		display: none;
+	}
+
+	.wcp-steps__item:not(:last-child)::before {
+		top: 40px;
+		left: 17px;
+	}
+
+	.wcp-form__grid {
+		grid-template-columns: minmax(0, 1fr);
+	}
+
+	/* `span 2` on a one-column grid would conjure an implicit second column. */
+	.wcp-field,
+	.wcp-field--half {
+		grid-column: auto;
+	}
+
+	.wcp-form__body,
+	.wcp-panel__head,
+	.wcp-form__actions,
+	.wcp-address-block,
+	.wcp-line-item,
+	.wcp-download {
+		padding-left: var(--wcp-space-4);
+		padding-right: var(--wcp-space-4);
+	}
+
+	.wcp-portal .wcp-panel__link {
+		padding-left: var(--wcp-space-4);
+		padding-right: var(--wcp-space-4);
+	}
+
+	.wcp-portal .wcp-totals {
+		margin: 0 var(--wcp-space-3) var(--wcp-space-3);
+	}
+
+	.wcp-form__actions {
+		flex-direction: column-reverse;
+		align-items: stretch;
+	}
+
+	.wcp-portal .wcp-form__actions .wcp-button {
+		width: 100%;
+	}
+
+	.wcp-timeline {
+		grid-auto-flow: row;
+		gap: var(--wcp-space-3);
+	}
+
+	.wcp-timeline__step {
+		flex-direction: row;
+		align-items: center;
+	}
+
+	.wcp-timeline__step::before {
+		top: 24px;
+		bottom: -14px;
+		left: 11px;
+		right: auto;
+		width: 2px;
+		height: auto;
+	}
+
+	.wcp-line-item {
+		grid-template-columns: auto minmax(0, 1fr);
+	}
+
+	.wcp-line-item__price {
+		grid-column: 2;
+		justify-self: start;
+	}
+
+	.wcp-download {
+		grid-template-columns: auto minmax(0, 1fr);
+	}
+
+	.wcp-portal .wcp-download__action {
+		grid-column: 2;
+		justify-self: start;
+	}
+
+	.wcp-mini-order__side {
+		flex-direction: column;
+		align-items: flex-end;
+		gap: 4px;
+	}
+
+	.wcp-mini-order__arrow {
+		display: none;
+	}
+
+	.wcp-mini-order__total {
+		min-width: 0;
+	}
+
+	.wcp-address-card__state {
+		display: none;
+	}
+
+	.wcp-order__facts {
+		grid-template-columns: minmax(0, 1fr);
+	}
+
+	.wcp-order__fact--total {
+		grid-column: auto;
+	}
+
+	.wcp-empty--lg {
+		padding: var(--wcp-space-9) var(--wcp-space-4);
+	}
+}
+
+/* --- Gate ---------------------------------------------------------------- */
+
+@container wcp-gate (max-width: 980px) {
+	.wcp-gate {
+		grid-template-columns: minmax(0, 1fr);
+		gap: var(--wcp-space-8);
+		max-width: 640px;
+	}
+
+	.wcp-authcard__orbit--a {
+		right: 12px;
+	}
+}
+
+@container wcp-gate (max-width: 620px) {
+	.wcp-gate {
+		padding: var(--wcp-space-8) var(--wcp-space-4);
+	}
+
+	.wcp-authcard__inner {
+		padding: var(--wcp-space-7) var(--wcp-space-5) var(--wcp-space-6);
+	}
+
+	.wcp-authcard__orbit {
+		display: none;
+	}
+
+	.wcp-portal .wcp-gate__headline {
+		font-size: 34px;
+	}
+}
+
+/* Fallback for engines without container query support. */
+@media (max-width: 980px) {
+	.wcp-gate {
+		grid-template-columns: minmax(0, 1fr);
+		gap: var(--wcp-space-8);
+		max-width: 640px;
+	}
+}
+
+/* --- Tablet and below: sidebar becomes an off-canvas drawer -------------- */
+
+@media (max-width: 1024px) {
+	.wcp-portal__frame {
+		grid-template-columns: minmax(0, 1fr);
+		min-height: 0;
+	}
+
+	.wcp-sidebar {
+		position: fixed;
+		top: 0;
+		bottom: 0;
+		left: 0;
+		z-index: 50;
+		width: min(312px, 86vw);
+		border-radius: 0;
+		border-right: 1px solid var(--wcp-border);
+		box-shadow: var(--wcp-shadow-xl);
+		background: linear-gradient(180deg, var(--wcp-surface) 0%, var(--wcp-bg-elevated) 100%);
+		transform: translate3d(-102%, 0, 0);
+		visibility: hidden;
+		transition: transform 340ms var(--wcp-ease), visibility 0s linear 340ms;
+	}
+
+	.wcp-sidebar::after {
+		display: none;
+	}
+
+	.wcp-sidebar__inner {
+		position: static;
+		max-height: none;
+		height: 100%;
+		padding: var(--wcp-space-5);
+	}
+
+	.wcp-portal .wcp-brand > .wcp-sidebar__close {
+		display: inline-grid;
+	}
+
+	.wcp-portal.is-drawer-open .wcp-sidebar {
+		transform: translate3d(0, 0, 0);
+		visibility: visible;
+		transition-delay: 0s, 0s;
+	}
+
+	.wcp-portal.is-drawer-open .wcp-scrim {
+		opacity: 1;
+		visibility: visible;
+		pointer-events: auto;
+		transition-delay: 0s, 0s;
+	}
+
+	/* Drawer contents settle in after the panel arrives. */
+	.wcp-portal.is-drawer-open .wcp-nav__item {
+		animation: wcp-rise 360ms var(--wcp-ease-out) both;
+		animation-delay: calc(80ms + var(--wcp-stagger, 0) * 30ms);
+	}
+
+	.wcp-header {
+		border-radius: var(--wcp-radius-xl) var(--wcp-radius-xl) 0 0;
+		padding-left: var(--wcp-space-5);
+		padding-right: var(--wcp-space-5);
+	}
+
+	.wcp-portal .wcp-header__inner > .wcp-header__menu {
+		display: inline-grid;
+	}
+
+	.wcp-header__crumb {
+		display: none;
+	}
+
+	.wcp-main {
+		padding: var(--wcp-space-6) var(--wcp-space-5) var(--wcp-space-8);
+	}
+
+	/* Touch targets: 44px on coarse pointers, comfortably above the 24px
+	   WCAG 2.2 AA minimum and matching platform touch guidance. */
+	.wcp-portal .wcp-nav__link {
+		padding: 12px var(--wcp-space-3);
+	}
+
+	.wcp-portal .wcp-icon-button {
+		width: 44px;
+		height: 44px;
+	}
+
+	.wcp-portal .wcp-button {
+		min-height: 44px;
+		padding: 12px 16px;
+	}
+
+	.wcp-portal .wcp-button--sm {
+		min-height: 40px;
+	}
+
+	.wcp-portal .wcp-user {
+		padding: var(--wcp-space-3) var(--wcp-space-2);
+	}
+}
+
+@media (max-width: 900px) {
+	.wcp-grid--3 {
+		grid-template-columns: repeat(2, minmax(0, 1fr));
+	}
+
+	.wcp-grid--split,
+	.wcp-grid--wide {
+		grid-template-columns: minmax(0, 1fr);
+	}
+}
+
+@media (max-width: 760px) {
+	.wcp-account-chip__meta {
+		display: none;
+	}
+
+	.wcp-portal .wcp-account-chip {
+		padding: 4px;
+	}
+
+	.wcp-account-chip__icon {
+		display: none;
+	}
+}
+
+@media (max-width: 640px) {
+	/* 16px inputs: no iOS zoom-on-focus. */
+	.wcp-portal .wcp-input {
+		min-height: 46px;
+		font-size: 16px;
+	}
+
+	.wcp-portal {
+		border-radius: var(--wcp-radius-lg);
+	}
+
+	.wcp-grid--3 {
+		grid-template-columns: minmax(0, 1fr);
+	}
+
+	.wcp-header {
+		gap: var(--wcp-space-3);
+		min-height: 66px;
+		padding: var(--wcp-space-3) var(--wcp-space-4);
+		border-radius: var(--wcp-radius-lg) var(--wcp-radius-lg) 0 0;
+	}
+
+	.wcp-portal .wcp-header__title {
+		font-size: var(--wcp-text-md);
+	}
+
+	.wcp-header__subtitle {
+		display: none;
+	}
+
+	.wcp-appearance__menu {
+		width: min(300px, calc(100vw - 32px));
+	}
+
+	.wcp-main {
+		padding: var(--wcp-space-5) var(--wcp-space-4) var(--wcp-space-7);
+	}
+
+	.wcp-main__inner {
+		gap: var(--wcp-space-6);
+	}
+
+	.wcp-hero {
+		padding: var(--wcp-space-5);
+	}
+
+	.wcp-portal .wcp-hero__title {
+		font-size: var(--wcp-text-2xl);
+	}
+
+	.wcp-hero__text {
+		font-size: var(--wcp-text-base);
+	}
+
+	.wcp-portal .wcp-section__title {
+		font-size: var(--wcp-text-xl);
+	}
+
+	.wcp-portal .wcp-order__title {
+		font-size: var(--wcp-text-2xl);
+	}
+
+	.wcp-avatar--lg {
+		width: 64px;
+		height: 64px;
+		font-size: var(--wcp-text-xl);
+		border-radius: 18px;
+	}
+
+	.wcp-metric {
+		padding: var(--wcp-space-4);
+	}
+
+	.wcp-metric__value {
+		font-size: var(--wcp-text-2xl);
+	}
+
+	.wcp-count-badge {
+		display: none;
+	}
+}
+
+/* ==========================================================================
+   21. Reduced motion, print, forced colors
+   ========================================================================== */
+
+@media (prefers-reduced-motion: reduce) {
+	.wcp-portal *,
+	.wcp-portal *::before,
+	.wcp-portal *::after {
+		animation-duration: 1ms !important;
+		animation-delay: 0ms !important;
+		animation-iteration-count: 1 !important;
+		transition-duration: 1ms !important;
+		transition-delay: 0ms !important;
+		scroll-behavior: auto !important;
+	}
+
+	/* Everything that enters by motion is simply present. */
+	.wcp-animate,
+	.wcp-empty,
+	.wcp-order-status,
+	.wcp-main__inner,
+	.wcp-main__inner.is-entering,
+	.wcp-main__inner.is-leaving,
+	.wcp-nav__item,
+	.wcp-field__error,
+	.wcp-feedback,
+	.wcp-appearance__menu {
+		animation: none !important;
+		opacity: 1 !important;
+		translate: 0 0 !important;
+		scale: 1 !important;
+		transform: none !important;
+	}
+
+	/* Ambient motion, parallax and tilt are motion by definition. */
+	.wcp-canvas__glow,
+	.wcp-canvas__wash,
+	.wcp-authcard__orbit,
+	.wcp-identity__ring,
+	.wcp-hero__eyebrow-dot,
+	.wcp-timeline__marker,
+	.wcp-nav__link.is-loading .wcp-nav__icon {
+		animation: none !important;
+	}
+
+	.wcp-canvas__wash {
+		background-position: 0% 50% !important;
+	}
+
+	.wcp-portal [data-wcp-tilt],
+	.wcp-portal [data-wcp-tilt] .wcp-depth-1,
+	.wcp-portal [data-wcp-tilt] .wcp-depth-2,
+	.wcp-portal [data-wcp-tilt] .wcp-depth-3 {
+		transform: none !important;
+	}
+
+	.wcp-card-3d__spot,
+	.wcp-hero__spot,
+	.wcp-authcard__spot,
+	.wcp-profile-head__spot,
+	.wcp-order__summary-spot,
+	.wcp-action__spot,
+	.wcp-product__spot,
+	.wcp-authcard__sheen,
+	.wcp-identity__sheen {
+		display: none;
+	}
+
+	.wcp-footer[data-wcp-reveal-ready] {
+		opacity: 1 !important;
+		translate: 0 0 !important;
+	}
+
+	/* The bar states a measurement; it does not need to be drawn arriving. */
+	.wcp-progress__fill {
+		animation: none !important;
+		transform: none !important;
+	}
+
+	/* The shimmer is the whole point of the skeleton, so it becomes a flat
+	   placeholder rather than a still gradient mid-sweep. */
+	.wcp-skeleton__bar::after,
+	.wcp-skeleton__block::after {
+		display: none;
+	}
+
+	/* Actions revealed by a transition must simply be present without one. */
+	.wcp-order-row__cta,
+	.wcp-metric__arrow,
+	.wcp-action__arrow,
+	.wcp-product__arrow,
+	.wcp-nav__chevron {
+		opacity: 1;
+		transform: none;
+	}
+
+	/* Hover states keep their meaning without moving. */
+	.wcp-portal .wcp-metric--link:hover,
+	.wcp-address-card:hover,
+	.wcp-order-row:hover,
+	.wcp-mini-order:hover,
+	.wcp-benefit:hover,
+	.wcp-activity__item:hover,
+	.wcp-portal .wcp-button:hover,
+	.wcp-portal .wcp-button:active,
+	.wcp-icon-button:hover,
+	.wcp-icon-button:active,
+	.wcp-account-chip:hover,
+	.wcp-backlink:hover,
+	.wcp-appearance__preset:hover,
+	.wcp-health__shop:hover,
+	.wcp-portal a.wcp-step:hover,
+	.wcp-next:hover,
+	.wcp-portal .wcp-action:hover,
+	.wcp-portal .wcp-product:hover {
+		transform: none;
+	}
+
+	.wcp-portal .wcp-metric--link:hover {
+		border-color: var(--wcp-primary);
+	}
+
+	.wcp-order-row:hover .wcp-order-row__arrow,
+	.wcp-backlink:hover .wcp-backlink__arrow,
+	.wcp-button:hover .wcp-button__arrow,
+	.wcp-metric--link:hover .wcp-metric__icon,
+	.wcp-benefit:hover .wcp-benefit__icon,
+	.wcp-brand:hover .wcp-brand__mark,
+	.wcp-nav__link:hover .wcp-nav__icon,
+	.wcp-action:hover .wcp-action__icon,
+	.wcp-next:hover .wcp-next__arrow,
+	a.wcp-step:hover .wcp-step__arrow {
+		transform: none;
+	}
+
+	.wcp-appearance__glyph {
+		transition: none;
+	}
+
+	/* The switcher's icons cross-fade by transform; without motion the
+	   inactive one has to be genuinely hidden rather than parked. */
+	.wcp-appearance__glyph--moon,
+	[data-wcp-theme="dark"] .wcp-appearance__glyph--sun {
+		display: none;
+		transform: none;
+	}
+
+	[data-wcp-theme="dark"] .wcp-appearance__glyph--moon {
+		display: grid;
+		transform: none;
+	}
+}
+
+@media print {
+	.wcp-skeleton,
+	.wcp-pagination,
+	.wcp-backlink,
+	.wcp-order-row__cta,
+	.wcp-appearance,
+	.wcp-canvas {
+		display: none !important;
+	}
+
+	.wcp-animate,
+	.wcp-empty {
+		animation: none !important;
+		opacity: 1 !important;
+		translate: 0 0 !important;
+	}
+
+	.wcp-portal {
+		border: 0;
+		box-shadow: none;
+	}
+
+	.wcp-sidebar,
+	.wcp-scrim,
+	.wcp-skip-link {
+		display: none !important;
+	}
+}
+
+@media (forced-colors: active) {
+	.wcp-portal {
+		border-color: CanvasText;
+	}
+
+	.wcp-nav__indicator {
+		border: 1px solid Highlight;
+		background: transparent;
+	}
+
+	.wcp-panel,
+	.wcp-hero,
+	.wcp-authcard,
+	.wcp-benefit__icon,
+	.wcp-metric,
+	.wcp-order__summary,
+	.wcp-profile-head,
+	.wcp-order-status {
+		border-color: CanvasText;
+	}
+
+	.wcp-canvas,
+	.wcp-card-3d__spot,
+	.wcp-hero__spot,
+	.wcp-authcard__spot,
+	.wcp-profile-head__spot,
+	.wcp-order__summary-spot {
+		display: none;
+	}
+}
+
+/* ==========================================================================
+   22. Presets and dark appearance
+   ========================================================================== */
+
+/*
+ * Every block below is a complete preset token set -- the same list of
+ * properties each time, never a partial. That is what lets the appearance
+ * attribute and the preset attribute combine in any order without one
+ * block's leftovers bleeding into another. Nothing here is a component
+ * rule; the surrounding site is never restyled.
+ *
+ *   Aurora   — violet / indigo, soft blue-violet ambient glow, clean surfaces
+ *   Obsidian — graphite / charcoal, cool neutrals, violet-blue highlights
+ *   Pearl    — warm near-white, neutral shadows, restrained blue-violet accent
+ *   Midnight — deep navy, cobalt and indigo glow, sophisticated night interface
+ *   Emerald  — charcoal with a forest undertone, emerald accent, quiet and financial
+ */
+
+/* --- Shared dark elevation (shadows are the same for every dark preset) -- */
+[data-wcp-theme="dark"] .wcp-portal,
+.wcp-portal[data-wcp-theme="dark"] {
+	--wcp-shadow-xs: 0 1px 2px rgba(0, 0, 0, 0.35);
+	--wcp-shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.35), 0 2px 6px -2px rgba(0, 0, 0, 0.4);
+	--wcp-shadow-md: 0 2px 4px -2px rgba(0, 0, 0, 0.4), 0 10px 24px -12px rgba(0, 0, 0, 0.55);
+	--wcp-shadow-lg: 0 4px 10px -4px rgba(0, 0, 0, 0.45), 0 24px 44px -18px rgba(0, 0, 0, 0.65);
+	--wcp-shadow-xl: 0 10px 20px -10px rgba(0, 0, 0, 0.5), 0 40px 70px -24px rgba(0, 0, 0, 0.75);
+	--wcp-shadow-3d: 0 30px 60px -28px rgba(0, 0, 0, 0.8), 0 18px 32px -20px rgba(var(--wcp-accent-rgb), 0.35);
+	--wcp-glow: 0 0 0 1px rgba(var(--wcp-accent-rgb), 0.22), 0 12px 32px -12px rgba(var(--wcp-accent-rgb), 0.55);
+	--wcp-ring: 0 0 0 3px rgba(var(--wcp-accent-rgb), 0.42);
+}
+
+[data-wcp-theme="dark"] .wcp-canvas__noise {
+	mix-blend-mode: screen;
+	opacity: 0.14;
+}
+
+[data-wcp-theme="dark"] .wcp-authcard__sheen,
+[data-wcp-theme="dark"] .wcp-identity__sheen {
+	opacity: 0.18;
+}
+
+[data-wcp-theme="dark"] .wcp-authcard {
+	box-shadow: var(--wcp-shadow-xl), var(--wcp-inset-highlight);
+}
+
+[data-wcp-theme="dark"] .wcp-line-item__qty {
+	background: var(--wcp-primary);
+	color: var(--wcp-primary-contrast);
+}
+
+/* --- Aurora · dark ------------------------------------------------------- */
+[data-wcp-theme="dark"] .wcp-portal,
+.wcp-portal[data-wcp-theme="dark"] {
+	--wcp-bg: #0b0e1a;
+	--wcp-bg-elevated: #11142a;
+	--wcp-bg-subtle: #181c33;
+	--wcp-surface: #141729;
+	--wcp-surface-raised: #1a1e35;
+	--wcp-surface-hover: #1c2039;
+	--wcp-surface-tint: #171b30;
+	--wcp-surface-blur: rgba(20, 23, 41, 0.8);
+	--wcp-veil: rgba(255, 255, 255, 0.03);
+	--wcp-grid-line: rgba(255, 255, 255, 0.045);
+	--wcp-highlight: rgba(255, 255, 255, 0.06);
+
+	--wcp-text: #e8e9f5;
+	--wcp-text-strong: #f7f7fd;
+	--wcp-muted: #a3a9c6;
+	--wcp-muted-soft: #8b92b0;
+
+	--wcp-border: rgba(255, 255, 255, 0.08);
+	--wcp-border-strong: rgba(255, 255, 255, 0.15);
+
+	--wcp-accent: #8b7cf6;
+	--wcp-accent-hover: #9d90f8;
+	--wcp-accent-active: #7c6cf0;
+	--wcp-accent-soft: #232147;
+	--wcp-accent-soft-hover: #2b2957;
+	--wcp-accent-contrast: #0f1020;
+	--wcp-accent-rgb: 139, 124, 246;
+	--wcp-accent-2-rgb: 96, 165, 250;
+
+	--wcp-success: #4ecf9c;
+	--wcp-success-soft: #14302a;
+	--wcp-info: #7fb4f0;
+	--wcp-info-soft: #152640;
+	--wcp-warning: #e5b566;
+	--wcp-warning-soft: #33260f;
+	--wcp-danger: #f28b90;
+	--wcp-danger-soft: #3a1c1e;
+	--wcp-neutral: #a6adbf;
+	--wcp-neutral-soft: #232838;
+
+	--wcp-shadow-color: 0, 0, 0;
+	--wcp-wash-a: rgba(139, 124, 246, 0.18);
+	--wcp-wash-b: rgba(96, 165, 250, 0.12);
+	--wcp-wash-c: rgba(236, 72, 153, 0.08);
+}
+
+/* --- Obsidian · light ---------------------------------------------------- */
+[data-wcp-visual="obsidian"] .wcp-portal {
+	--wcp-avatar-base: 240;
+	--wcp-bg: #f0f1f3;
+	--wcp-bg-elevated: #f7f8f9;
+	--wcp-bg-subtle: #e8e9ec;
+	--wcp-surface: #fbfbfc;
+	--wcp-surface-raised: #ffffff;
+	--wcp-surface-hover: #f3f4f6;
+	--wcp-surface-tint: #f9f9fa;
+	--wcp-surface-blur: rgba(251, 251, 252, 0.74);
+	--wcp-veil: rgba(255, 255, 255, 0.66);
+	--wcp-grid-line: rgba(15, 17, 22, 0.05);
+	--wcp-highlight: rgba(255, 255, 255, 0.9);
+
+	--wcp-text: #101215;
+	--wcp-text-strong: #060709;
+	--wcp-muted: #4a4f5a;
+	--wcp-muted-soft: #626876;
+
+	--wcp-border: rgba(15, 17, 22, 0.1);
+	--wcp-border-strong: rgba(15, 17, 22, 0.18);
+
+	--wcp-accent: #4f5bd5;
+	--wcp-accent-hover: #4350c4;
+	--wcp-accent-active: #3944ab;
+	--wcp-accent-soft: #eaecfa;
+	--wcp-accent-soft-hover: #dfe2f7;
+	--wcp-accent-contrast: #ffffff;
+	--wcp-accent-rgb: 79, 91, 213;
+	--wcp-accent-2-rgb: 71, 130, 220;
+
+	--wcp-success: #0d7a58;
+	--wcp-success-soft: #e2f4ec;
+	--wcp-info: #1f5fa9;
+	--wcp-info-soft: #e6effb;
+	--wcp-warning: #8a5a00;
+	--wcp-warning-soft: #fdf1da;
+	--wcp-danger: #a3282d;
+	--wcp-danger-soft: #fde9e9;
+	--wcp-neutral: #5b6578;
+	--wcp-neutral-soft: #eceef3;
+
+	--wcp-shadow-color: 15, 17, 22;
+	--wcp-wash-a: rgba(79, 91, 213, 0.12);
+	--wcp-wash-b: rgba(71, 130, 220, 0.1);
+	--wcp-wash-c: rgba(40, 44, 60, 0.06);
+}
+
+/* --- Obsidian · dark ----------------------------------------------------- */
+[data-wcp-theme="dark"][data-wcp-visual="obsidian"] .wcp-portal,
+[data-wcp-visual="obsidian"] .wcp-portal[data-wcp-theme="dark"] {
+	--wcp-bg: #0a0b0e;
+	--wcp-bg-elevated: #0f1114;
+	--wcp-bg-subtle: #16181d;
+	--wcp-surface: #121417;
+	--wcp-surface-raised: #181a1f;
+	--wcp-surface-hover: #1c1f25;
+	--wcp-surface-tint: #14161a;
+	--wcp-surface-blur: rgba(18, 20, 23, 0.82);
+	--wcp-veil: rgba(255, 255, 255, 0.03);
+	--wcp-grid-line: rgba(255, 255, 255, 0.04);
+	--wcp-highlight: rgba(255, 255, 255, 0.06);
+
+	--wcp-text: #e6e7ea;
+	--wcp-text-strong: #f5f6f8;
+	--wcp-muted: #a2a7b3;
+	--wcp-muted-soft: #8a909c;
+
+	--wcp-border: rgba(255, 255, 255, 0.08);
+	--wcp-border-strong: rgba(255, 255, 255, 0.15);
+
+	--wcp-accent: #8f98ff;
+	--wcp-accent-hover: #a2aaff;
+	--wcp-accent-active: #7d87f5;
+	--wcp-accent-soft: #202336;
+	--wcp-accent-soft-hover: #282c44;
+	--wcp-accent-contrast: #0d0e14;
+	--wcp-accent-rgb: 143, 152, 255;
+	--wcp-accent-2-rgb: 100, 160, 255;
+
+	--wcp-success: #4ecf9c;
+	--wcp-success-soft: #14302a;
+	--wcp-info: #86b6f2;
+	--wcp-info-soft: #162538;
+	--wcp-warning: #e5b566;
+	--wcp-warning-soft: #33260f;
+	--wcp-danger: #f28b90;
+	--wcp-danger-soft: #3a1c1e;
+	--wcp-neutral: #a3a9b6;
+	--wcp-neutral-soft: #22252c;
+
+	--wcp-shadow-color: 0, 0, 0;
+	--wcp-wash-a: rgba(143, 152, 255, 0.14);
+	--wcp-wash-b: rgba(100, 160, 255, 0.1);
+	--wcp-wash-c: rgba(255, 255, 255, 0.03);
+}
+
+/* --- Pearl · light ------------------------------------------------------- */
+[data-wcp-visual="pearl"] .wcp-portal {
+	--wcp-avatar-base: 238;
+	--wcp-bg: #f7f5f0;
+	--wcp-bg-elevated: #fbfaf6;
+	--wcp-bg-subtle: #efece5;
+	--wcp-surface: #fffefb;
+	--wcp-surface-raised: #ffffff;
+	--wcp-surface-hover: #f6f4ee;
+	--wcp-surface-tint: #fcfbf7;
+	--wcp-surface-blur: rgba(255, 254, 251, 0.75);
+	--wcp-veil: rgba(255, 255, 255, 0.7);
+	--wcp-grid-line: rgba(70, 60, 40, 0.05);
+	--wcp-highlight: rgba(255, 255, 255, 0.9);
+
+	--wcp-text: #1d1b17;
+	--wcp-text-strong: #0f0e0b;
+	--wcp-muted: #5a564d;
+	--wcp-muted-soft: #69645a;
+
+	--wcp-border: rgba(70, 60, 40, 0.11);
+	--wcp-border-strong: rgba(70, 60, 40, 0.2);
+
+	--wcp-accent: #4a5fc1;
+	--wcp-accent-hover: #3f52ae;
+	--wcp-accent-active: #354696;
+	--wcp-accent-soft: #e9ecf8;
+	--wcp-accent-soft-hover: #dde2f4;
+	--wcp-accent-contrast: #ffffff;
+	--wcp-accent-rgb: 74, 95, 193;
+	--wcp-accent-2-rgb: 196, 150, 96;
+
+	--wcp-success: #0f7b58;
+	--wcp-success-soft: #e3f3ea;
+	--wcp-info: #2a5ea0;
+	--wcp-info-soft: #e7eef9;
+	--wcp-warning: #8a5a00;
+	--wcp-warning-soft: #fbf0d8;
+	--wcp-danger: #a3282d;
+	--wcp-danger-soft: #fbe9e7;
+	--wcp-neutral: #625d54;
+	--wcp-neutral-soft: #eeebe4;
+
+	--wcp-shadow-color: 60, 50, 30;
+	--wcp-wash-a: rgba(74, 95, 193, 0.1);
+	--wcp-wash-b: rgba(214, 160, 90, 0.13);
+	--wcp-wash-c: rgba(120, 90, 60, 0.05);
+}
+
+/* --- Pearl · dark -------------------------------------------------------- */
+[data-wcp-theme="dark"][data-wcp-visual="pearl"] .wcp-portal,
+[data-wcp-visual="pearl"] .wcp-portal[data-wcp-theme="dark"] {
+	--wcp-bg: #141311;
+	--wcp-bg-elevated: #191815;
+	--wcp-bg-subtle: #1f1d19;
+	--wcp-surface: #1b1a17;
+	--wcp-surface-raised: #21201c;
+	--wcp-surface-hover: #252420;
+	--wcp-surface-tint: #1d1c18;
+	--wcp-surface-blur: rgba(27, 26, 23, 0.82);
+	--wcp-veil: rgba(255, 250, 240, 0.03);
+	--wcp-grid-line: rgba(255, 250, 240, 0.045);
+	--wcp-highlight: rgba(255, 250, 240, 0.06);
+
+	--wcp-text: #efeae0;
+	--wcp-text-strong: #fbf8f1;
+	--wcp-muted: #aca69a;
+	--wcp-muted-soft: #948e83;
+
+	--wcp-border: rgba(255, 250, 240, 0.09);
+	--wcp-border-strong: rgba(255, 250, 240, 0.16);
+
+	--wcp-accent: #93a2f2;
+	--wcp-accent-hover: #a5b1f5;
+	--wcp-accent-active: #8090e6;
+	--wcp-accent-soft: #24273a;
+	--wcp-accent-soft-hover: #2c3046;
+	--wcp-accent-contrast: #12131c;
+	--wcp-accent-rgb: 147, 162, 242;
+	--wcp-accent-2-rgb: 214, 170, 110;
+
+	--wcp-success: #4ecf9c;
+	--wcp-success-soft: #17302a;
+	--wcp-info: #86b6f2;
+	--wcp-info-soft: #182538;
+	--wcp-warning: #e7b96a;
+	--wcp-warning-soft: #33290f;
+	--wcp-danger: #f28b90;
+	--wcp-danger-soft: #3a1e1e;
+	--wcp-neutral: #a8a296;
+	--wcp-neutral-soft: #26241f;
+
+	--wcp-shadow-color: 0, 0, 0;
+	--wcp-wash-a: rgba(147, 162, 242, 0.14);
+	--wcp-wash-b: rgba(214, 170, 110, 0.1);
+	--wcp-wash-c: rgba(255, 240, 220, 0.03);
+}
+
+/* --- Midnight · light ---------------------------------------------------- */
+[data-wcp-visual="midnight"] .wcp-portal {
+	--wcp-avatar-base: 222;
+	--wcp-bg: #eef1f8;
+	--wcp-bg-elevated: #f6f8fc;
+	--wcp-bg-subtle: #e3e8f4;
+	--wcp-surface: #ffffff;
+	--wcp-surface-raised: #ffffff;
+	--wcp-surface-hover: #f2f5fc;
+	--wcp-surface-tint: #fafbff;
+	--wcp-surface-blur: rgba(255, 255, 255, 0.74);
+	--wcp-veil: rgba(255, 255, 255, 0.66);
+	--wcp-grid-line: rgba(16, 26, 60, 0.05);
+	--wcp-highlight: rgba(255, 255, 255, 0.88);
+
+	--wcp-text: #0f1830;
+	--wcp-text-strong: #060c1c;
+	--wcp-muted: #46506e;
+	--wcp-muted-soft: #5b6583;
+
+	--wcp-border: rgba(16, 26, 60, 0.095);
+	--wcp-border-strong: rgba(16, 26, 60, 0.18);
+
+	--wcp-accent: #2f4fd8;
+	--wcp-accent-hover: #2743c0;
+	--wcp-accent-active: #1f37a3;
+	--wcp-accent-soft: #e6ebfd;
+	--wcp-accent-soft-hover: #d8e0fb;
+	--wcp-accent-contrast: #ffffff;
+	--wcp-accent-rgb: 47, 79, 216;
+	--wcp-accent-2-rgb: 60, 140, 230;
+
+	--wcp-success: #0d7a58;
+	--wcp-success-soft: #e2f4ec;
+	--wcp-info: #1f5fa9;
+	--wcp-info-soft: #e6effb;
+	--wcp-warning: #8a5a00;
+	--wcp-warning-soft: #fdf1da;
+	--wcp-danger: #a3282d;
+	--wcp-danger-soft: #fde9e9;
+	--wcp-neutral: #56607c;
+	--wcp-neutral-soft: #e9ecf4;
+
+	--wcp-shadow-color: 12, 22, 60;
+	--wcp-wash-a: rgba(47, 79, 216, 0.13);
+	--wcp-wash-b: rgba(60, 140, 230, 0.1);
+	--wcp-wash-c: rgba(90, 60, 200, 0.06);
+}
+
+/* --- Midnight · dark ----------------------------------------------------- */
+[data-wcp-theme="dark"][data-wcp-visual="midnight"] .wcp-portal,
+[data-wcp-visual="midnight"] .wcp-portal[data-wcp-theme="dark"] {
+	--wcp-bg: #070c1c;
+	--wcp-bg-elevated: #0c1226;
+	--wcp-bg-subtle: #121a33;
+	--wcp-surface: #0e1528;
+	--wcp-surface-raised: #141d34;
+	--wcp-surface-hover: #182241;
+	--wcp-surface-tint: #101729;
+	--wcp-surface-blur: rgba(14, 21, 40, 0.84);
+	--wcp-veil: rgba(255, 255, 255, 0.03);
+	--wcp-grid-line: rgba(150, 180, 255, 0.055);
+	--wcp-highlight: rgba(255, 255, 255, 0.07);
+
+	--wcp-text: #e4e9f7;
+	--wcp-text-strong: #f6f8ff;
+	--wcp-muted: #a2adcd;
+	--wcp-muted-soft: #8a94b6;
+
+	--wcp-border: rgba(150, 175, 255, 0.11);
+	--wcp-border-strong: rgba(150, 175, 255, 0.2);
+
+	--wcp-accent: #7b9cff;
+	--wcp-accent-hover: #8fadff;
+	--wcp-accent-active: #6a8bf5;
+	--wcp-accent-soft: #18224a;
+	--wcp-accent-soft-hover: #1f2b5c;
+	--wcp-accent-contrast: #060a18;
+	--wcp-accent-rgb: 123, 156, 255;
+	--wcp-accent-2-rgb: 96, 200, 255;
+
+	--wcp-success: #4ecf9c;
+	--wcp-success-soft: #12302a;
+	--wcp-info: #86b6f2;
+	--wcp-info-soft: #152640;
+	--wcp-warning: #e5b566;
+	--wcp-warning-soft: #33260f;
+	--wcp-danger: #f28b90;
+	--wcp-danger-soft: #3a1c1e;
+	--wcp-neutral: #a3abc6;
+	--wcp-neutral-soft: #1c2440;
+
+	--wcp-shadow-color: 0, 0, 0;
+	--wcp-wash-a: rgba(123, 156, 255, 0.18);
+	--wcp-wash-b: rgba(70, 130, 255, 0.13);
+	--wcp-wash-c: rgba(120, 80, 255, 0.08);
+}
+
+/* --- Emerald · light ----------------------------------------------------- */
+[data-wcp-visual="emerald"] .wcp-portal {
+	--wcp-avatar-base: 158;
+	--wcp-bg: #eef3f0;
+	--wcp-bg-elevated: #f7faf8;
+	--wcp-bg-subtle: #e4ebe7;
+	--wcp-surface: #ffffff;
+	--wcp-surface-raised: #ffffff;
+	--wcp-surface-hover: #f2f7f4;
+	--wcp-surface-tint: #fafcfb;
+	--wcp-surface-blur: rgba(255, 255, 255, 0.74);
+	--wcp-veil: rgba(255, 255, 255, 0.66);
+	--wcp-grid-line: rgba(18, 48, 38, 0.05);
+	--wcp-highlight: rgba(255, 255, 255, 0.88);
+
+	--wcp-text: #0f1a16;
+	--wcp-text-strong: #06110d;
+	--wcp-muted: #44554d;
+	--wcp-muted-soft: #596a61;
+
+	--wcp-border: rgba(18, 48, 38, 0.1);
+	--wcp-border-strong: rgba(18, 48, 38, 0.19);
+
+	--wcp-accent: #0b6f52;
+	--wcp-accent-hover: #095d45;
+	--wcp-accent-active: #074c38;
+	--wcp-accent-soft: #e0f2ea;
+	--wcp-accent-soft-hover: #d1ebe0;
+	--wcp-accent-contrast: #ffffff;
+	--wcp-accent-rgb: 11, 111, 82;
+	--wcp-accent-2-rgb: 30, 145, 130;
+
+	--wcp-success: #0d7a58;
+	--wcp-success-soft: #e2f4ec;
+	--wcp-info: #1f5fa9;
+	--wcp-info-soft: #e6effb;
+	--wcp-warning: #8a5a00;
+	--wcp-warning-soft: #fdf1da;
+	--wcp-danger: #a3282d;
+	--wcp-danger-soft: #fde9e9;
+	--wcp-neutral: #54635b;
+	--wcp-neutral-soft: #e9efec;
+
+	--wcp-shadow-color: 10, 40, 30;
+	--wcp-wash-a: rgba(11, 111, 82, 0.12);
+	--wcp-wash-b: rgba(30, 145, 130, 0.1);
+	--wcp-wash-c: rgba(150, 140, 60, 0.05);
+}
+
+/* --- Emerald · dark ------------------------------------------------------ */
+[data-wcp-theme="dark"][data-wcp-visual="emerald"] .wcp-portal,
+[data-wcp-visual="emerald"] .wcp-portal[data-wcp-theme="dark"] {
+	--wcp-bg: #08100d;
+	--wcp-bg-elevated: #0d1613;
+	--wcp-bg-subtle: #131e1a;
+	--wcp-surface: #0f1815;
+	--wcp-surface-raised: #15201c;
+	--wcp-surface-hover: #192521;
+	--wcp-surface-tint: #111a17;
+	--wcp-surface-blur: rgba(15, 24, 21, 0.84);
+	--wcp-veil: rgba(255, 255, 255, 0.03);
+	--wcp-grid-line: rgba(140, 255, 205, 0.05);
+	--wcp-highlight: rgba(255, 255, 255, 0.06);
+
+	--wcp-text: #e3ece7;
+	--wcp-text-strong: #f4faf7;
+	--wcp-muted: #a1b4ab;
+	--wcp-muted-soft: #899b92;
+
+	--wcp-border: rgba(160, 255, 210, 0.1);
+	--wcp-border-strong: rgba(160, 255, 210, 0.18);
+
+	--wcp-accent: #34d399;
+	--wcp-accent-hover: #4ee0a8;
+	--wcp-accent-active: #22c58a;
+	--wcp-accent-soft: #102a21;
+	--wcp-accent-soft-hover: #15362a;
+	--wcp-accent-contrast: #04140e;
+	--wcp-accent-rgb: 52, 211, 153;
+	--wcp-accent-2-rgb: 56, 189, 178;
+
+	--wcp-success: #4ecf9c;
+	--wcp-success-soft: #113026;
+	--wcp-info: #7fc2e8;
+	--wcp-info-soft: #10263a;
+	--wcp-warning: #e5b566;
+	--wcp-warning-soft: #31260f;
+	--wcp-danger: #f28b90;
+	--wcp-danger-soft: #381d1e;
+	--wcp-neutral: #9aa8a1;
+	--wcp-neutral-soft: #1b2420;
+
+	--wcp-shadow-color: 0, 0, 0;
+	--wcp-wash-a: rgba(52, 211, 153, 0.14);
+	--wcp-wash-b: rgba(56, 189, 178, 0.1);
+	--wcp-wash-c: rgba(255, 255, 255, 0.03);
+}

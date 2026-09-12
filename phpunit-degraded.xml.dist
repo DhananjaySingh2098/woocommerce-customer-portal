@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+	The WooCommerce-absent suite. Separate configuration because the bootstrap
+	decides whether to load WooCommerce at process start, so the two modes
+	cannot share a process.
+-->
+<phpunit
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:noNamespaceSchemaLocation="https://schema.phpunit.de/9.6/phpunit.xsd"
+	bootstrap="tests/bootstrap.php"
+	colors="true"
+	failOnRisky="true"
+	failOnWarning="true"
+>
+	<php>
+		<env name="WCP_TESTS_WITHOUT_WC" value="1" />
+	</php>
+	<testsuites>
+		<testsuite name="degraded">
+			<directory suffix="-test.php">tests/degraded</directory>
+		</testsuite>
+	</testsuites>
+</phpunit>

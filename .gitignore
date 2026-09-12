@@ -1,0 +1,39 @@
+# Dependencies
+/vendor/
+/node_modules/
+
+# Build output
+/build/
+/dist/
+*.zip
+
+# WordPress / PHP tooling
+.phpunit.result.cache
+/tests/_output/
+/tests/coverage/
+.phpcs.cache
+phpcs.xml
+phpunit.xml
+!phpcs.xml.dist
+!phpunit.xml.dist
+
+# Environment & secrets
+.env
+.env.*
+*.pem
+*.key
+wp-config-local.php
+
+# Editors
+.idea/
+.vscode/
+*.sublime-*
+
+# OS
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Logs
+*.log
+debug.log
